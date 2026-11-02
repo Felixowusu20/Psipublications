@@ -1,4 +1,4 @@
-# Nahda Publications — Google Scholar & SEO Readiness Report
+# PSI Publications — Google Scholar & SEO Readiness Report
 
 **Date:** 2026-08-03  
 **Scope:** Scholar metadata, JSON-LD, sitemaps, robots, journal/issue discovery, public PDFs, DOI-ready architecture  

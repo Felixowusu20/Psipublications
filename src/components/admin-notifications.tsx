@@ -22,8 +22,8 @@ export function AdminNotifications() {
   return (
     <RealtimeNotifications
       apiPath="/api/admin/notifications"
-      storageKey="nahda-admin-notif"
-      tagPrefix="nahda-admin"
+      storageKey="psi-admin-notif"
+      tagPrefix="psi-admin"
       hrefFor={adminHref}
       enableLabel="Enable alerts"
     />

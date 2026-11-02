@@ -1,15 +1,15 @@
 /**
- * Nahda Publications PayPal APC collection.
+ * PSI Publications PayPal APC collection.
  * Payments are sent manually to this PayPal account (not Paystack).
  */
 
 export const PAYPAL_ACCOUNT = {
-  /** PayPal login / send-to email (Nahda Publications). */
+  /** PayPal login / send-to email (PSI Publications). */
   email: "Asareowusuclems2024@gmail.com",
   /** PayPal account display name. */
   accountName: "Asare Clement",
   /** Legal / publishing house that owns this account. */
-  organization: "Nahda Publications",
+  organization: "PSI Publications",
   /** Open PayPal login / send-money flow. */
   sendUrl: "https://www.paypal.com/signin",
 } as const;

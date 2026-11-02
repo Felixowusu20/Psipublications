@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useAdminAuth } from "@/components/admin-auth-provider";
-import { NahdaLoader } from "@/components/nahda-loader";
+import { PSILoader } from "@/components/nahda-loader";
 
 type ReceiptRow = {
   id: string;
@@ -147,7 +147,7 @@ export default function AdminFinancesPage() {
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-[var(--line)] bg-white">
         {loading ? (
-          <NahdaLoader variant="panel" label="Loading receipts…" />
+          <PSILoader variant="panel" label="Loading receipts…" />
         ) : receipts.length === 0 ? (
           <p className="px-5 py-10 text-center text-sm text-[var(--muted)]">
             No receipts match this search.

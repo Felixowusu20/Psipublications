@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
-import { NahdaLoader } from "@/components/nahda-loader";
+import { PSILoader } from "@/components/nahda-loader";
 import { PasswordField } from "@/components/password-field";
 
 function ResetPasswordForm() {
@@ -145,7 +145,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<NahdaLoader variant="panel" />}>
+    <Suspense fallback={<PSILoader variant="panel" />}>
       <ResetPasswordForm />
     </Suspense>
   );

@@ -64,7 +64,7 @@ export function JournalImageCard({
         ) : (
           <div className="flex h-full items-start justify-between p-3 sm:p-4">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/75 sm:text-xs">
-              Nahda
+              PSI
             </span>
             <span className="rounded bg-black/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white sm:px-2 sm:text-[10px]">
               {journal.shortTitle}
@@ -74,7 +74,7 @@ export function JournalImageCard({
       </div>
 
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-3 pt-14 sm:p-4 sm:pt-20">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-200 sm:text-[11px]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#e8a0b2] sm:text-[11px]">
           {journal.openAccess ? "Open access" : "Subscription"}
         </p>
         <h3 className="mt-0.5 line-clamp-3 font-[family-name:var(--font-display)] text-sm font-semibold leading-snug text-white sm:mt-1 sm:text-lg">

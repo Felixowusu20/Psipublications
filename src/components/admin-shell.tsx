@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { useAdminAuth } from "@/components/admin-auth-provider";
 import { AdminNotifications } from "@/components/admin-notifications";
-import { NahdaLoader } from "@/components/nahda-loader";
+import { PSILoader } from "@/components/nahda-loader";
 import { initials } from "@/lib/session-client";
 
 type NavIcon =
@@ -441,8 +441,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   if (!ready || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0b1f33] text-white">
-        <NahdaLoader variant="dark" label="Loading admin…" />
+      <div className="flex min-h-screen items-center justify-center bg-[#1a0f14] text-white">
+        <PSILoader variant="dark" label="Loading admin…" />
       </div>
     );
   }
@@ -455,7 +455,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       className="admin-theme-root flex h-dvh max-h-dvh overflow-hidden bg-[var(--admin-soft-bg,#f3f6f9)] text-[var(--ink)] print:block print:h-auto print:max-h-none print:min-h-0 print:overflow-visible print:bg-white"
     >
       <aside
-        className={`hidden shrink-0 border-r border-[var(--line)] bg-[#0b1f33] text-white transition-[width] duration-200 print:hidden lg:flex lg:flex-col ${
+        className={`hidden shrink-0 border-r border-[var(--line)] bg-[#1a0f14] text-white transition-[width] duration-200 print:hidden lg:flex lg:flex-col ${
           collapsed ? "w-[72px]" : "w-64"
         }`}
       >
@@ -465,7 +465,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           {collapsed ? (
             <Image
               src="/favicon.png"
-              alt="Nahda"
+              alt="PSI"
               width={32}
               height={32}
               className="mx-auto h-8 w-8 rounded-md"
@@ -480,8 +480,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 className="h-8 w-8 rounded-md"
               />
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-                  Nahda Admin
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#e8a0b2]">
+                  PSI Admin
                 </p>
                 <p className="font-[family-name:var(--font-display)] text-lg leading-tight">
                   Control panel
@@ -588,7 +588,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             </button>
             <div className="lg:hidden">
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--accent)]">
-                Nahda Admin
+                PSI Admin
               </p>
             </div>
           </div>

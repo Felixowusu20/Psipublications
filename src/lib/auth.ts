@@ -46,7 +46,7 @@ export const seedUsers: DemoUser[] = [
     email: "editor@nahdapublications.com",
     password: "demo1234",
     role: "editor",
-    institution: "Nahda Publications",
+    institution: "PSI Publications",
     researchInterests: ["Editorial Policy", "Open Science"],
   },
 ];

@@ -1,10 +1,10 @@
 /**
- * Build an A4 PDF from the live Nahda article template in the admin browser.
- * Hobby-plan Vercel functions cannot run Chrome, so this never calls the server.
+ * Build an A4 PDF from the live PSI article template in the admin browser.
+ * Server functions do not run Chrome, so this never calls the server.
  *
  * Paged.js paginates like Chrome Print (whole A4 sheets, two columns, figures
  * stay together). Each sheet is captured once — never sliced through a line.
- * The Nahda footer is drawn in jsPDF so author PDFs have no admin chrome.
+ * The PSI footer is drawn in jsPDF so author PDFs have no admin chrome.
  */
 
 import { CLOUDINARY_MAX_UPLOAD_BYTES } from "@/lib/prepare-upload-file";
@@ -343,7 +343,7 @@ function footerBits(root: HTMLElement): FooterBits {
   const footer = root.querySelector(".nahda-running-footer");
   const copyright =
     footer?.querySelector("p")?.textContent?.replace(/\s+/g, " ").trim() ||
-    `© ${new Date().getFullYear()} The Authors. Published by Nahda Publications`;
+    `© ${new Date().getFullYear()} The Authors. Published by PSI Publications`;
   const doiLink = footer?.querySelector("a");
   const doi =
     doiLink?.textContent?.replace(/\s+/g, " ").trim() ||
@@ -354,7 +354,7 @@ function footerBits(root: HTMLElement): FooterBits {
 
 async function loadLogo(): Promise<LogoPng | null> {
   try {
-    const res = await fetch("/brand/logo-nahda.png");
+    const res = await fetch("/brand/logo-psi.png");
     if (!res.ok) return null;
     const blob = await res.blob();
     const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -932,7 +932,7 @@ export async function articleTemplateToPdf(
       ? source
       : source.querySelector<HTMLElement>(".nahda-article");
   if (!article) {
-    throw new Error("The Nahda article template is not ready yet.");
+    throw new Error("The PSI article template is not ready yet.");
   }
 
   if (typeof document !== "undefined" && "fonts" in document) {
@@ -959,7 +959,7 @@ export async function articleTemplateToPdf(
 
   if (blob.size < 100) {
     throw new Error(
-      "The Nahda print PDF was empty. Try Print preview, then Publish again.",
+      "The PSI print PDF was empty. Try Print preview, then Publish again.",
     );
   }
   return blob;

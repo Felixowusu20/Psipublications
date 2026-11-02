@@ -2,7 +2,7 @@ import "dotenv/config";
 import { prisma } from "../src/lib/db";
 import { ensureCmsDefaults } from "../src/lib/cms";
 
-const ABOUT_BODY = `Nahda Publications is a scholarly publishing house that supports researchers from first submission through peer review, production, and open publication with DOI-backed records.
+const ABOUT_BODY = `PSI Publications is a scholarly publishing house that supports researchers from first submission through peer review, production, and open publication with DOI-backed records.
 
 We operate peer-reviewed journals across science, technology, and related fields. Our platform gives authors a clear editorial workflow, transparent status tracking, and secure handling of manuscripts and article processing charges.
 
@@ -10,11 +10,11 @@ What we stand for
 
 - Rigorous peer review and editorial standards
 - Clear fees and waiver pathways after acceptance
-- Secure payments processed through Paystack
+- Secure payments collected via PayPal (PSI Publications)
 - Open discovery via DOI metadata and journal sites
 - Responsive support for authors and readers
 
-Questions about Nahda Publications, payments, or editorial policy can be sent to nahdapublications@gmail.com.`;
+Questions about PSI Publications, payments, or editorial policy can be sent to psipublications@gmail.com.`;
 
 async function main() {
   await ensureCmsDefaults();

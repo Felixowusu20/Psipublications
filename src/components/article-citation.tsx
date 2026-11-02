@@ -79,7 +79,7 @@ function ApaCitationText({
             target="_blank"
             rel="noreferrer"
             className={`break-all underline-offset-2 hover:underline ${
-              isBanner ? "text-emerald-200" : "text-[var(--accent)]"
+              isBanner ? "text-[#e8a0b2]" : "text-[var(--accent)]"
             }`}
           >
             {citation.doiUrl}

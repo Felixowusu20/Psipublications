@@ -115,9 +115,9 @@ function RunningFooter({
       <div className="flex flex-row items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo-nahda.png" alt="Nahda Publications" />
+          <img src="/brand/logo-psi.png" alt="PSI Publications" />
           <p className="text-[10px] leading-snug text-[#5b6b7c]">
-            © {year} The Authors. Published by Nahda Publications
+            © {year} The Authors. Published by PSI Publications
           </p>
         </div>
         <div className="flex min-w-0 items-end justify-end gap-3 sm:max-w-[55%]">
@@ -147,7 +147,7 @@ function RunningFooter({
  * Journal-bound article preview. Header, authors, abstract, and keywords
  * come from this journal's template; the body is imported HTML.
  */
-export function NahdaArticleTemplate({
+export function PSIArticleTemplate({
   journalTitle,
   journalShortTitle,
   manuscriptId,

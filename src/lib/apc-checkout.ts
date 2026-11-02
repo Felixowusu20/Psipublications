@@ -441,10 +441,10 @@ export async function markApcPaid(opts: {
   const receiptNumber = nahdaReceiptNumber(updated.manuscriptId, paidAt);
 
   try {
-    // Always send the official Nahda receipt to the submitting author account.
+    // Always send the official PSI receipt to the submitting author account.
     const mail = await sendEmail({
       to: submission.author.email,
-      subject: `Nahda Publications receipt: ${updated.manuscriptId} — ${amountLabel}`,
+      subject: `PSI Publications receipt: ${updated.manuscriptId} — ${amountLabel}`,
       html: apcReceiptEmailHtml({
         authorName: updated.author.name,
         title: updated.title,
@@ -460,14 +460,14 @@ export async function markApcPaid(opts: {
         submissionUrl: `${base}/dashboard`,
       }),
       text: [
-        `Nahda Publications — APC payment receipt`,
+        `PSI Publications — APC payment receipt`,
         ``,
         `Receipt: ${receiptNumber}`,
         `Status: PAID`,
         `Amount paid: ${amountLabel}`,
         `Currency: USD`,
-        `Method: PayPal (Nahda Publications)`,
-        `Merchant: Nahda Publications`,
+        `Method: PayPal (PSI Publications)`,
+        `Merchant: PSI Publications`,
         `Journal: ${updated.journal.title}`,
         `Manuscript: ${updated.manuscriptId}`,
         `Title: ${updated.title}`,
@@ -482,13 +482,13 @@ export async function markApcPaid(opts: {
     });
     if (mail.skipped) {
       console.warn(
-        "[apc-receipt] SMTP not configured — Nahda receipt was not emailed",
+        "[apc-receipt] SMTP not configured — PSI receipt was not emailed",
       );
     } else if (!mail.ok) {
       console.error("[apc-receipt] send failed", mail.error);
     } else {
       console.info(
-        `[apc-receipt] sent Nahda USD receipt to submitting author ${submission.author.email}`,
+        `[apc-receipt] sent PSI USD receipt to submitting author ${submission.author.email}`,
       );
     }
   } catch (err) {

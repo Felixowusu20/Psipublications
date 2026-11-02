@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Libre_Franklin, Source_Serif_4 } from "next/font/google";
+import { Libre_Baskerville, Source_Sans_3 } from "next/font/google";
 import { AuthProvider } from "@/components/auth-provider";
 import { AosProvider } from "@/components/aos-provider";
 import { CookieConsentGate } from "@/components/cookie-consent-gate";
@@ -7,46 +7,52 @@ import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { seoBaseUrl } from "@/lib/seo/scholar";
 import "./globals.css";
 
-const body = Libre_Franklin({
+/** Nature-like editorial stack: Harding/Palatino → Libre Baskerville; Helvetica UI → Source Sans 3 */
+const body = Source_Sans_3({
   variable: "--font-body",
   subsets: ["latin"],
+  weight: ["400", "600", "700"],
 });
 
-const display = Source_Serif_4({
+const display = Libre_Baskerville({
   variable: "--font-display",
   subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(seoBaseUrl()),
   title: {
-    default: "Nahda Publications",
-    template: "%s | Nahda Publications",
+    default: "PSI Publications",
+    template: "%s | PSI Publications",
   },
   description:
-    "Peer-reviewed open-access journals. Submit manuscripts, track peer review, and discover scholarly articles with NID-backed records.",
-  applicationName: "Nahda Publications",
+    "Peer-reviewed open-access journals across chemistry, biology, physics, and related sciences. Submit manuscripts, track peer review, and discover scholarly articles with NID-backed records.",
+  applicationName: "PSI Publications",
   keywords: [
-    "Nahda Publications",
+    "PSI Publications",
     "open access journals",
     "peer review",
     "scholarly publishing",
+    "chemistry",
+    "biology",
+    "physics",
     "NID",
   ],
-  authors: [{ name: "Nahda Publications" }],
+  authors: [{ name: "PSI Publications" }],
   openGraph: {
     type: "website",
-    siteName: "Nahda Publications",
-    title: "Nahda Publications",
+    siteName: "PSI Publications",
+    title: "PSI Publications",
     description:
-      "Peer-reviewed open-access journals and scholarly articles.",
+      "Peer-reviewed open-access journals and scholarly articles across the sciences.",
     url: seoBaseUrl(),
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nahda Publications",
+    title: "PSI Publications",
     description:
-      "Peer-reviewed open-access journals and scholarly articles.",
+      "Peer-reviewed open-access journals and scholarly articles across the sciences.",
   },
   robots: {
     index: true,

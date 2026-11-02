@@ -15,10 +15,10 @@ const SIZES: Record<Variant, { box: string; icon: string; text: string }> = {
 };
 
 /**
- * Brand loading state: the Nahda favicon pumping inside pulsing rings.
+ * Brand loading state: the PSI favicon pumping inside pulsing rings.
  * Safe in server components — animation is pure CSS.
  */
-export function NahdaLoader({ label, variant = "panel", className }: Props) {
+export function PSILoader({ label, variant = "panel", className }: Props) {
   const size = SIZES[variant];
   const onDark = variant === "dark";
 
@@ -63,10 +63,10 @@ export function NahdaLoader({ label, variant = "panel", className }: Props) {
       <div className={isRow ? "text-left" : "text-center"}>
         <p
           className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
-            onDark ? "text-emerald-200/90" : "text-[var(--accent)]"
+            onDark ? "text-[#e8a0b2]" : "text-[var(--accent)]"
           }`}
         >
-          Nahda Publications
+          PSI Publications
         </p>
         <p
           className={`mt-1 ${size.text} ${

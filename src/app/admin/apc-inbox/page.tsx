@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useAdminAuth } from "@/components/admin-auth-provider";
-import { NahdaLoader } from "@/components/nahda-loader";
+import { PSILoader } from "@/components/nahda-loader";
 
 function proofViewPath(item: {
   proofUrl: string;
@@ -169,7 +169,7 @@ export default function AdminApcInboxPage() {
       ) : null}
 
       {loading ? (
-        <NahdaLoader variant="panel" label="Loading APC inbox…" />
+        <PSILoader variant="panel" label="Loading APC inbox…" />
       ) : items.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--line)] bg-white p-8 text-center text-sm text-[var(--muted)]">
           No reported payments waiting. When authors mark PayPal as sent, they

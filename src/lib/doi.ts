@@ -1,5 +1,5 @@
 /**
- * Nahda Identifier (NID) — pure helpers safe for client + server.
+ * PSI Identifier (NID) — pure helpers safe for client + server.
  * Not a Crossref/DOI Agency DOI. Stored in PublishedArticle.doi for compatibility.
  *
  * DB operations live in `@/lib/doi-db` so browser bundles never pull in `pg`.
@@ -52,7 +52,7 @@ export function isValidDoiShape(input: string): boolean {
   return isValidNidShape(input);
 }
 
-/** Public Nahda NID path. */
+/** Public PSI NID path. */
 export function nidPath(id: string): string {
   return `/nid/${normalizeDoi(id)}`;
 }

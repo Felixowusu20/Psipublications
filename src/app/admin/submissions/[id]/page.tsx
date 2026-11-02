@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState, use } from "react";
 import { RevisionFiles } from "@/components/revision-files";
-import { NahdaLoader } from "@/components/nahda-loader";
+import { PSILoader } from "@/components/nahda-loader";
 import { FeedbackHistory } from "@/components/feedback-history";
 import { SubmissionProgressBar } from "@/components/submission-progress-bar";
 import { readApiJson, uploadFileDirect } from "@/lib/client-upload";
@@ -138,7 +138,7 @@ export default function AdminSubmissionDetailPage({
     if (!submission) return;
     if (
       !confirm(
-        "Confirm that PayPal APC payment was received for this manuscript? The submitting author will be emailed a Nahda receipt.",
+        "Confirm that PayPal APC payment was received for this manuscript? The submitting author will be emailed a PSI receipt.",
       )
     ) {
       return;
@@ -257,7 +257,7 @@ export default function AdminSubmissionDetailPage({
   }
 
   if (!submission) {
-    return <NahdaLoader variant="panel" label="Loading submission…" />;
+    return <PSILoader variant="panel" label="Loading submission…" />;
   }
 
   return (

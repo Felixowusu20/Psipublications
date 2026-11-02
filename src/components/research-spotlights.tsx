@@ -40,7 +40,7 @@ function Card({
           </div>
         )}
         {item.logoUrl ? (
-          <div className="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-white/70 bg-white/95 p-1.5 shadow-sm backdrop-blur">
+          <div className="absolute bottom-3 left-3 flex h-10 w-10 items-center justify-center overflow-hidden border border-white/70 bg-white/95 p-1.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.logoUrl}
@@ -50,11 +50,9 @@ function Card({
           </div>
         ) : null}
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
-          Research area
-        </p>
-        <h3 className="font-[family-name:var(--font-display)] text-lg leading-snug text-[var(--ink)]">
+      <div className="flex flex-1 flex-col gap-2 pt-3">
+        <p className="nature-kicker">Research area</p>
+        <h3 className="nature-title text-[1.05rem] leading-snug group-hover:text-[var(--accent)]">
           {item.title}
         </h3>
         {item.summary ? (
@@ -79,7 +77,7 @@ function Card({
   );
 
   const className =
-    "research-spotlight-card group flex w-[min(82vw,280px)] shrink-0 flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-[0_10px_30px_-18px_rgba(11,58,83,0.35)] sm:w-[min(78vw,280px)]";
+    "research-spotlight-card group flex w-[min(82vw,280px)] shrink-0 flex-col overflow-hidden border-0 bg-white sm:w-[min(78vw,280px)]";
 
   const aosProps = {
     "data-aos": "fade-up",
@@ -135,21 +133,19 @@ export function ResearchSpotlights({
       data-aos="fade-up"
       data-aos-duration="900"
     >
-      <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6 sm:pt-16">
+      <div className="mx-auto max-w-[1200px] px-4 pt-8 sm:px-6 sm:pt-12">
         <div
-          className="flex flex-wrap items-end justify-between gap-3"
+          className="flex flex-wrap items-end justify-between gap-3 border-b border-[var(--line)] pb-4"
           data-aos="fade-up"
           data-aos-delay="60"
           data-aos-duration="900"
         >
           <div className="max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-              Featured research
-            </p>
-            <h2 className="mt-1.5 font-[family-name:var(--font-display)] text-2xl leading-tight tracking-tight text-[var(--ink)] sm:mt-2 sm:text-4xl">
+            <p className="nature-kicker">Featured research</p>
+            <h2 className="mt-1.5 font-[family-name:var(--font-display)] text-2xl font-bold leading-tight text-[var(--ink)] sm:mt-2 sm:text-3xl">
               Scientific research areas
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--muted)] sm:mt-3 sm:text-base">
+            <p className="mt-2 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
               Explore partner research themes and the papers we have published
               in those areas.
             </p>

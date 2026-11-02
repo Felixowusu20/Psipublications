@@ -520,7 +520,7 @@ function beautifyReferences(html: string): string {
 
 /**
  * Keep Introduction → References. Title, authors, abstract, and keywords
- * stay on the Nahda journal template, not in the imported body.
+ * stay on the PSI journal template, not in the imported body.
  */
 export function sliceHtmlFromIntroduction(html: string): {
   body: string;

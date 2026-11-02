@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ArticleListingCard } from "@/components/article-listing-card";
-import { JournalImageCard } from "@/components/journal-image-card";
+import { NatureJournalList } from "@/components/nature-journal-list";
 import { publishingWorkflow } from "@/data/mock";
 import { matchesQuery } from "@/lib/page-search";
 import {
@@ -141,17 +141,8 @@ function HomeCatalogInner({
   const [q, setQ] = useState(initialQuery);
   const [remoteArticles, setRemoteArticles] = useState<RemoteArticle[]>([]);
   const [remoteJournals, setRemoteJournals] = useState<RemoteJournal[]>([]);
-  const [activeGoal, setActiveGoal] = useState(goalTabs[0]?.key ?? "publish");
-
-  useEffect(() => {
-    if (!goalTabs.some((tab) => tab.key === activeGoal)) {
-      setActiveGoal(goalTabs[0]?.key ?? "publish");
-    }
-  }, [goalTabs, activeGoal]);
 
   const needle = q.trim();
-  const activeTab =
-    goalTabs.find((tab) => tab.key === activeGoal) ?? goalTabs[0];
 
   const localArticles = useMemo(
     () =>
@@ -248,122 +239,66 @@ function HomeCatalogInner({
 
       <div id="home-results" className="scroll-mt-28" />
 
-      {/* ACS-style: Find the right resources for your goals */}
+      {/* Nature-style goal cards — same editorial card language as nature.com */}
       {showGoals ? (
         <section
           className="border-b border-[var(--line)] bg-white"
           data-aos="fade-up"
           data-aos-duration="800"
         >
-          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16">
-            <div className="max-w-3xl" data-aos="fade-up" data-aos-delay="40">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-                {goalsHeading.eyebrow}
-              </p>
-              <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl leading-tight text-[var(--ink)] sm:text-4xl">
-                {goalsHeading.title}
-              </h2>
+          <div className="mx-auto max-w-[1200px] px-4 py-10 sm:px-6 sm:py-12">
+            <div className="max-w-3xl border-b border-[var(--line)] pb-4">
+              <p className="nature-kicker">{goalsHeading.eyebrow}</p>
+              <h2 className="nature-section-title mt-1.5">{goalsHeading.title}</h2>
               {goalsHeading.body ? (
-                <p className="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
+                <p className="mt-2.5 text-[0.95rem] leading-relaxed text-[var(--ink)]">
                   {goalsHeading.body}
                 </p>
               ) : null}
             </div>
 
-            <div
-              className="mt-8 flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-4 [&::-webkit-scrollbar]:hidden"
-              role="tablist"
-              aria-label="Author and reader goals"
-            >
+            <div className="mt-6 grid gap-x-6 gap-y-9 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
               {goalTabs.map((tab) => {
-                const selected = tab.key === activeGoal;
+                const primary = tab.links[0];
                 return (
-                  <button
-                    key={tab.key}
-                    type="button"
-                    role="tab"
-                    aria-selected={selected}
-                    onClick={() => setActiveGoal(tab.key)}
-                    className={`group relative aspect-[3/4] w-[min(42vw,9.5rem)] shrink-0 overflow-hidden rounded-2xl text-left transition sm:w-[11rem] sm:rounded-3xl ${
-                      selected
-                        ? "ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-white shadow-md"
-                        : "ring-1 ring-[var(--line)] hover:ring-[var(--accent)]/40"
-                    }`}
-                  >
-                    <Image
-                      src={tab.imageUrl}
-                      alt=""
-                      fill
-                      className="object-cover transition duration-700 group-hover:scale-[1.05]"
-                      sizes="180px"
-                      unoptimized
-                    />
-                    <div
-                      className="absolute inset-0 bg-gradient-to-t from-[var(--ink)] via-[var(--ink)]/45 to-transparent"
-                      aria-hidden
-                    />
-                    <span className="absolute inset-x-0 bottom-0 p-3 sm:p-3.5">
-                      <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200/90 sm:text-[11px]">
-                        {tab.story ?? ""}
-                      </span>
-                      <span className="mt-1 block font-[family-name:var(--font-display)] text-sm font-semibold leading-snug text-white sm:text-base">
-                        {tab.label}
-                      </span>
-                    </span>
-                  </button>
+                  <article key={tab.key} className="flex h-full flex-col">
+                    <Link
+                      href={primary?.href || "/journals"}
+                      className="group flex h-full flex-col"
+                    >
+                      <div className="relative aspect-[1.84/1] w-full overflow-hidden bg-[var(--surface)]">
+                        <Image
+                          src={tab.imageUrl}
+                          alt={tab.imageAlt || tab.label}
+                          fill
+                          className="object-cover object-center"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 220px"
+                          unoptimized
+                        />
+                      </div>
+                      <h3 className="mt-3 font-[family-name:var(--font-display)] text-[1.1rem] font-bold leading-[1.3] text-[var(--ink)]">
+                        <span className="underline decoration-1 underline-offset-[0.16em] group-hover:text-[var(--accent)]">
+                          {tab.title}
+                        </span>
+                      </h3>
+                      <p className="mt-2 text-[0.9rem] leading-[1.45] text-[var(--ink)]">
+                        {tab.body}
+                      </p>
+                      <p className="mt-auto pt-3 text-[0.8rem] leading-snug text-[var(--ink)]">
+                        <span className="font-bold">{tab.label}</span>
+                        {tab.story ? (
+                          <>
+                            <span className="mx-1.5 text-[var(--muted)]" aria-hidden>
+                              |
+                            </span>
+                            <span>{tab.story}</span>
+                          </>
+                        ) : null}
+                      </p>
+                    </Link>
+                  </article>
                 );
               })}
-            </div>
-
-            {/* No data-aos here — AOS opacity:0 on remount blocked tab switches. */}
-            <div
-              role="tabpanel"
-              key={activeTab.key}
-              className="home-goal-panel mt-6 grid gap-0 overflow-hidden rounded-2xl bg-[var(--surface)]/80 sm:mt-8 sm:rounded-3xl lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch"
-            >
-              <div className="flex flex-col justify-center p-5 sm:p-8 lg:p-10">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
-                  {activeTab.story ?? ""}
-                </p>
-                <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl text-[var(--ink)] sm:text-2xl">
-                  {activeTab.title}
-                </h3>
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-                  {activeTab.body}
-                </p>
-                <ul className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
-                  {activeTab.links.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-[var(--accent)] ring-1 ring-[var(--line)] transition hover:ring-[var(--accent)]/40"
-                      >
-                        {link.label}
-                        <span aria-hidden>→</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="relative min-h-[200px] overflow-hidden sm:min-h-[300px] lg:min-h-full">
-                <Image
-                  key={activeTab.imageUrl}
-                  src={activeTab.imageUrl}
-                  alt={activeTab.imageAlt || activeTab.label}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 42vw"
-                  unoptimized
-                />
-                <div
-                  className="absolute inset-0 bg-gradient-to-t from-[var(--ink)]/80 via-[var(--ink)]/20 to-transparent"
-                  aria-hidden
-                />
-                <p className="absolute inset-x-0 bottom-0 p-4 text-sm font-medium leading-snug text-white sm:p-6 sm:text-base">
-                  {activeTab.imageCaption ?? ""}
-                </p>
-              </div>
             </div>
           </div>
         </section>
@@ -382,22 +317,20 @@ function HomeCatalogInner({
             data-aos-delay="40"
           >
             <div className="max-w-2xl">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-                The latest from Nahda
-              </p>
-              <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl leading-tight text-[var(--ink)] sm:text-4xl">
+              <p className="nature-kicker">The latest from PSI</p>
+              <h2 className="nature-section-title mt-1.5">
                 News, issues, and new research
               </h2>
-              <p className="mt-3 text-base leading-relaxed text-[var(--muted)]">
+              <p className="mt-2.5 text-[0.95rem] leading-relaxed text-[var(--ink)]">
                 Announcements from the editorial office and the newest open
                 articles across our journals.
               </p>
             </div>
             <Link
               href="/articles"
-              className="shrink-0 text-sm font-semibold text-[var(--accent)] hover:underline"
+              className="shrink-0 text-sm font-bold text-[var(--accent)] underline decoration-1 underline-offset-2"
             >
-              View all articles →
+              View all articles
             </Link>
           </div>
 
@@ -426,7 +359,7 @@ function HomeCatalogInner({
                         ) : (
                           <div className="flex aspect-[16/10] items-end bg-gradient-to-br from-[var(--accent)] to-[var(--ink)] p-4">
                             <p className="font-[family-name:var(--font-display)] text-lg text-white">
-                              Nahda News
+                              PSI News
                             </p>
                           </div>
                         )}
@@ -541,7 +474,7 @@ function HomeCatalogInner({
                 Publishing pathway
               </p>
               <h2 className="mt-1.5 font-[family-name:var(--font-display)] text-2xl leading-tight text-[var(--ink)] sm:mt-2 sm:text-4xl">
-                How publishing works on Nahda
+                How publishing works on PSI
               </h2>
               <p className="mt-2 text-base leading-relaxed text-[var(--muted)] sm:mt-3 sm:text-lg">
                 A clear path from manuscript upload to open publication.
@@ -594,61 +527,48 @@ function HomeCatalogInner({
         </section>
       ) : null}
 
-      {/* ACS-style: Powering scientific discovery — journal family */}
+      {/* Journals — clean Nature list (no cards) */}
       {(!needle || displayedJournals.length > 0) && (
         <section
-          className="border-b border-[var(--line)] bg-[var(--ink)] text-white"
+          className="border-b border-[var(--line)] bg-white"
           data-aos="fade-up"
           data-aos-duration="800"
         >
-          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-16">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+          <div className="mx-auto max-w-[1200px] px-4 py-10 sm:px-6 sm:py-12">
+            <div className="mb-6 flex flex-col gap-2 border-b border-[var(--line)] pb-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-2xl">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200/80">
-                  Portfolio
-                </p>
-                <h2 className="mt-1.5 font-[family-name:var(--font-display)] text-2xl leading-tight sm:mt-2 sm:text-4xl">
-                  Powering scholarly discovery
+                <p className="nature-kicker">Journals</p>
+                <h2 className="nature-section-title mt-1.5">
+                  Our journal portfolio
                 </h2>
-                <p className="mt-2 text-sm leading-relaxed text-white/70 sm:mt-3 sm:text-base">
-                  Open-access journals delivering peer-reviewed research across
-                  the Nahda family of titles.
+                <p className="mt-2 text-[0.95rem] leading-relaxed text-[var(--ink)]">
+                  Peer-reviewed open-access titles across the PSI family.
+                  Choose a journal to view scope, issues, and how to submit.
                 </p>
               </div>
               <Link
                 href="/journals"
-                className="shrink-0 self-start text-sm font-semibold text-emerald-200 hover:underline"
+                className="shrink-0 self-start text-sm font-bold text-[var(--ink)] underline decoration-1 underline-offset-2 hover:text-[var(--accent)]"
               >
-                All journals →
+                View all journals
               </Link>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-10 sm:gap-5 lg:grid-cols-3">
-              {displayedJournals.length === 0 ? (
-                <p className="col-span-2 rounded-2xl bg-white/5 p-5 text-sm text-white/70 ring-1 ring-white/10 sm:p-6 sm:text-base lg:col-span-3">
-                  Add journals in the admin CMS.
-                </p>
-              ) : (
-                displayedJournals.map((journal, index) => (
-                  <JournalImageCard
-                    key={journal.id}
-                    tone="dark"
-                    index={index}
-                    aosDelay={Math.min(index * 80, 320)}
-                    journal={{
-                      id: journal.id,
-                      slug: journal.slug,
-                      title: journal.title,
-                      shortTitle: journal.shortTitle,
-                      openAccess: journal.openAccess,
-                      coverImageUrl: journal.coverImageUrl,
-                      coverColor: journal.coverColor,
-                      subjects: journal.subjects,
-                    }}
-                  />
-                ))
-              )}
-            </div>
+            {displayedJournals.length === 0 ? (
+              <p className="bg-black px-6 py-5 text-base text-white/70">
+                Add journals in the admin CMS.
+              </p>
+            ) : (
+              <NatureJournalList
+                variant="page"
+                journals={displayedJournals.map((journal) => ({
+                  slug: journal.slug,
+                  title: journal.title,
+                  shortTitle: journal.shortTitle,
+                  openAccess: journal.openAccess,
+                }))}
+              />
+            )}
           </div>
         </section>
       )}
@@ -670,13 +590,13 @@ function HomeCatalogInner({
           />
           <div className="relative mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-6 sm:py-16">
             <div className="max-w-xl">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
+              <p className="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-white/75">
                 For authors
               </p>
-              <h2 className="mt-1.5 font-[family-name:var(--font-display)] text-2xl leading-tight sm:mt-2 sm:text-4xl">
+              <h2 className="mt-1.5 font-[family-name:var(--font-display)] text-xl font-bold leading-tight sm:text-2xl lg:text-[1.85rem]">
                 Be part of what comes next in research
               </h2>
-              <p className="mt-2 text-sm leading-relaxed text-white/85 sm:mt-3 sm:text-base">
+              <p className="mt-2.5 text-[0.95rem] leading-relaxed text-white/88">
                 Create an account, choose a journal, and track your manuscript
                 from peer review through NID assignment and open publication.
               </p>

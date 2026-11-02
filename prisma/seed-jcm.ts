@@ -1,2 +1,2 @@
-/** @deprecated Use seed-nahda-journals.ts */
-import "./seed-nahda-journals";
+/** @deprecated Use seed-psi-journals.ts */
+import "./seed-psi-journals";

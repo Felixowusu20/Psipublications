@@ -29,7 +29,7 @@ export type EngagementBar = {
 };
 
 const PALETTE = [
-  "#1e6847",
+  "#6e1f3a",
   "#2a7f9e",
   "#d65c33",
   "#6b5b95",

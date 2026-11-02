@@ -168,7 +168,7 @@ export async function POST(request: Request) {
         "Kind regards,",
         "Editorial Office",
         journal.title,
-        "Nahda Publications",
+        "PSI Publications",
       ].join("\n"),
     });
     if (!mail.ok) {

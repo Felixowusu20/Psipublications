@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { NahdaLoader } from "@/components/nahda-loader";
+import { PSILoader } from "@/components/nahda-loader";
 import { RequireAuth } from "@/components/require-auth";
 import { SubmissionWizard } from "@/components/submission-wizard";
 
@@ -16,7 +16,7 @@ export default function NewSubmissionPage() {
         </p>
         <div className="mt-8">
           <Suspense
-            fallback={<NahdaLoader variant="panel" label="Loading wizard…" />}
+            fallback={<PSILoader variant="panel" label="Loading wizard…" />}
           >
             <SubmissionWizard />
           </Suspense>

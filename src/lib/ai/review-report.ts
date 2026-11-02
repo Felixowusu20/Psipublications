@@ -149,17 +149,17 @@ export function buildPlaceholderReviewReport(input: {
     fileName: input.fileName ?? null,
     providerNote,
     overallSummary:
-      "Nahda AI desk review completed across intake, peer review, revision, production, publish, and APC checks. Editors should confirm every finding before sending to authors.",
+      "PSI AI desk review completed across intake, peer review, revision, production, publish, and APC checks. Editors should confirm every finding before sending to authors.",
     recommendedStatus: "MINOR_REVISION",
     sections,
     closingNote:
-      "This letter was prepared with Nahda AI Assist. A human editor must approve the decision status and wording before it is sent to the corresponding author.",
+      "This letter was prepared with PSI AI Assist. A human editor must approve the decision status and wording before it is sent to the corresponding author.",
   };
 }
 
 export function reportToPlainMessage(report: AiReviewReport): string {
   const lines: string[] = [
-    `Nahda AI editorial review — ${report.manuscriptId}`,
+    `PSI AI editorial review — ${report.manuscriptId}`,
     `Title: ${report.title}`,
     `Journal: ${report.journalTitle}`,
     `Author: ${report.authorName} <${report.authorEmail}>`,
@@ -203,7 +203,7 @@ export function reportToDocHtml(report: AiReviewReport): string {
         .join("");
       return `
       <div style="margin:0 0 22px;padding:0 0 16px;border-bottom:1px solid #d7dee7">
-        <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#1e6847;font-weight:700">
+        <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#6e1f3a;font-weight:700">
           ${escapeHtml(section.stageLabel)}
         </p>
         <h2 style="margin:0 0 8px;font-size:16px;color:#0b1f33">${escapeHtml(section.title)}</h2>
@@ -223,14 +223,14 @@ export function reportToDocHtml(report: AiReviewReport): string {
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Nahda AI Review — ${escapeHtml(report.manuscriptId)}</title>
+<title>PSI AI Review — ${escapeHtml(report.manuscriptId)}</title>
 </head>
 <body style="margin:0;padding:32px;font-family:Helvetica,Arial,sans-serif;color:#0b1f33;background:#fff">
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:720px;margin:0 auto">
     <tr>
-      <td style="padding:0 0 18px;border-bottom:3px solid #1e6847">
-        <p style="margin:0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#1e6847;font-weight:700">
-          Nahda Publications · Editorial intelligence
+      <td style="padding:0 0 18px;border-bottom:3px solid #6e1f3a">
+        <p style="margin:0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#6e1f3a;font-weight:700">
+          PSI Publications · Editorial intelligence
         </p>
         <h1 style="margin:8px 0 0;font-size:22px">AI desk review report</h1>
       </td>

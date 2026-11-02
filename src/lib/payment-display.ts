@@ -1,10 +1,10 @@
-/** Cardholder-facing payment copy. Always USD for Nahda APCs. */
+/** Cardholder-facing payment copy. Always USD for PSI APCs. */
 
-export const NAHDA_MERCHANT_NAME = "Nahda Publications";
+export const PSI_MERCHANT_NAME = "PSI Publications";
 export const OTP_ACCOUNT_PROMPT = "Enter the OTP sent to your account.";
 /** Shown to cardholders — bank OTP entry window (countdown). */
 export const OTP_BANK_CODE_VALIDITY_MINUTES = 2;
-/** Nahda checkout window for entering bank OTP (matches 2-minute countdown). */
+/** PSI checkout window for entering bank OTP (matches 2-minute countdown). */
 export const OTP_SESSION_DURATION_MS = OTP_BANK_CODE_VALIDITY_MINUTES * 60 * 1000;
 export const OTP_SESSION_SECONDS = OTP_BANK_CODE_VALIDITY_MINUTES * 60;
 export const DISPLAY_CURRENCY = "USD";

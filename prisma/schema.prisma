@@ -442,13 +442,13 @@ model HomeSection {
   updatedAt DateTime @updatedAt
 }
 
-/// House NID (Nahda Identifier) configuration — free IDs minted on publish.
+/// House NID (PSI Identifier) configuration — free IDs minted on publish.
 model DoiSettings {
   id            String   @id @default("default")
   /// Prefix only, e.g. "nid" (no trailing slash). Not a Crossref DOI prefix.
   prefix        String   @default("nid")
-  label         String   @default("Nahda Identifier (NID)")
-  publisherName String   @default("Nahda Publications")
+  label         String   @default("PSI Identifier (NID)")
+  publisherName String   @default("PSI Publications")
   notes         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

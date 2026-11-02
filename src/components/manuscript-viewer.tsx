@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { NahdaLoader } from "@/components/nahda-loader";
+import { PSILoader } from "@/components/nahda-loader";
 import {
   detectFileKind,
   googleEmbedUrl,
@@ -145,7 +145,7 @@ export function ManuscriptViewer({ url, publicId, title, className }: Props) {
         {mode === "native" && (
           <>
             {loading && (
-              <NahdaLoader variant="panel" label="Loading manuscript…" />
+              <PSILoader variant="panel" label="Loading manuscript…" />
             )}
 
             {!loading && error && (

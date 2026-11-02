@@ -2,8 +2,8 @@
 
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { NahdaCheckoutModal } from "@/components/nahda-checkout-modal";
-import { NahdaLoader } from "@/components/nahda-loader";
+import { PSICheckoutModal } from "@/components/nahda-checkout-modal";
+import { PSILoader } from "@/components/nahda-loader";
 
 type PayInfo = {
   submissionId: string;
@@ -58,18 +58,18 @@ export default function PayPage({
   }
 
   if (!info) {
-    return <NahdaLoader variant="screen" label="Opening secure payment…" />;
+    return <PSILoader variant="screen" label="Opening secure payment…" />;
   }
 
   if (paid || info.alreadyCleared) {
     return (
-      <NahdaLoader variant="screen" label="Payment successful. Opening your dashboard…" />
+      <PSILoader variant="screen" label="Payment successful. Opening your dashboard…" />
     );
   }
 
   return (
     <div className="min-h-[80vh] bg-[var(--paper)]">
-      <NahdaCheckoutModal
+      <PSICheckoutModal
         open
         closable={false}
         onClose={() => undefined}

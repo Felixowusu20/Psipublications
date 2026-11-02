@@ -47,7 +47,7 @@ function formatExpiry(value: string) {
   return `${digits.slice(0, 2)}/${digits.slice(2)}`;
 }
 
-export function NahdaCheckoutModal({
+export function PSICheckoutModal({
   open,
   onClose,
   submissionId,
@@ -483,13 +483,13 @@ export function NahdaCheckoutModal({
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/brand/logo-nahda-on-dark.png"
+                src="/brand/logo-psi-on-dark.png"
                 alt=""
                 className="h-10 w-auto object-contain"
               />
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-100/90">
-                  Nahda Publications
+                  PSI Publications
                 </p>
                 <h2
                   id={titleId}
@@ -522,7 +522,7 @@ export function NahdaCheckoutModal({
               <dt className="text-emerald-100/70">Currency</dt>
               <dd className="font-semibold">USD</dd>
               <dt className="text-emerald-100/70">Merchant</dt>
-              <dd className="font-semibold">Nahda Publications</dd>
+              <dd className="font-semibold">PSI Publications</dd>
             </dl>
             <p className="mt-2 truncate text-xs text-emerald-50/85">
               Manuscript {manuscriptId}
@@ -545,7 +545,7 @@ export function NahdaCheckoutModal({
                 Payment received
               </h3>
               <p className="mt-2 text-sm text-[var(--muted)]">
-                {amountLabel} has been charged. A Nahda Publications receipt in
+                {amountLabel} has been charged. A PSI Publications receipt in
                 USD has been emailed
                 {receiptEmail ? ` to ${receiptEmail}` : " to you"}.
               </p>
@@ -579,7 +579,7 @@ export function NahdaCheckoutModal({
                 <div className="flex justify-between gap-3 py-2">
                   <dt className="text-[var(--muted)]">Merchant</dt>
                   <dd className="font-semibold text-[var(--ink)]">
-                    Nahda Publications
+                    PSI Publications
                   </dd>
                 </div>
               </dl>
@@ -832,7 +832,7 @@ export function NahdaCheckoutModal({
 
               <p className="text-center text-[11px] text-[var(--muted)]">
                 Card details are sent securely to Paystack and are never stored
-                by Nahda Publications.
+                by PSI Publications.
               </p>
             </form>
           )}

@@ -52,7 +52,7 @@ function drawPulsingFavicon(
     -Math.PI / 2,
     -Math.PI / 2 + progress * Math.PI * 2,
   );
-  ctx.strokeStyle = "#1e6847";
+  ctx.strokeStyle = "#6e1f3a";
   ctx.lineWidth = 4;
   ctx.lineCap = "round";
   ctx.stroke();

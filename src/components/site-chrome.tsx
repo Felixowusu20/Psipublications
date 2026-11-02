@@ -23,14 +23,21 @@ function useNavItems(journals: NavJournal[]): NavItem[] {
   return useMemo(
     () => [
       {
+        label: "Explore content",
+        href: "/articles",
+        children: [
+          { label: "Latest articles", href: "/articles" },
+          { label: "Current issues", href: "/articles/current-issues" },
+          { label: "Past issues", href: "/articles/past-issues" },
+          { label: "Search articles", href: "/search" },
+          { label: "Open access", href: "/articles?access=oa" },
+        ],
+      },
+      {
         label: "Journals",
         href: "/journals",
         children: [
-          {
-            label: "Browse all journals",
-            href: "/journals",
-            hint: "Titles, ISSN, scope",
-          },
+          { label: "View all journals", href: "/journals" },
           ...journals.map((j) => ({
             label: j.title,
             href: `/journals/${j.slug}`,
@@ -38,60 +45,25 @@ function useNavItems(journals: NavJournal[]): NavItem[] {
         ],
       },
       {
-        label: "Articles",
-        href: "/articles",
+        label: "About the journals",
+        href: "/about",
         children: [
-          {
-            label: "Latest articles",
-            href: "/articles",
-            hint: "Published articles",
-          },
-          {
-            label: "Current issues",
-            href: "/articles/current-issues",
-            hint: "Latest issue of each journal",
-          },
-          {
-            label: "Past issues",
-            href: "/articles/past-issues",
-            hint: "Archives by year and journal",
-          },
-          {
-            label: "Search articles",
-            href: "/search",
-            hint: "Title, author, NID, keyword",
-          },
-          { label: "Open access", href: "/articles?access=oa" },
+          { label: "About PSI", href: "/about" },
+          { label: "Help centre & FAQ", href: "/help" },
+          { label: "Contact support", href: "/help#contact" },
+          { label: "Terms & Conditions", href: "/terms" },
+          { label: "Privacy Policy", href: "/privacy" },
         ],
       },
       {
-        label: "For Authors",
+        label: "Publish with us",
         href: "/authors/guidelines",
         children: [
-          {
-            label: "Submit a manuscript",
-            href: "/submissions/new",
-            hint: "Start a new submission",
-          },
-          {
-            label: "Author dashboard",
-            href: "/dashboard",
-            hint: "Track manuscripts",
-          },
+          { label: "Submit a manuscript", href: "/submissions/new" },
+          { label: "Author dashboard", href: "/dashboard" },
           { label: "Author guidelines", href: "/authors/guidelines" },
           { label: "Article types", href: "/authors/article-types" },
           { label: "Fees & waivers", href: "/authors/fees" },
-        ],
-      },
-      {
-        label: "Help",
-        href: "/help",
-        children: [
-          { label: "Help centre & FAQ", href: "/help" },
-          { label: "Contact support", href: "/help#contact" },
-          { label: "About Nahda", href: "/about" },
-          { label: "Terms & Conditions", href: "/terms" },
-          { label: "Privacy Policy", href: "/privacy" },
         ],
       },
     ],
@@ -109,12 +81,40 @@ export function SiteHeader() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSection, setMobileSection] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
   const hydrated = useRef(false);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     hydrated.current = true;
+  }, []);
+
+  useEffect(() => {
+    lastScrollY.current = window.scrollY;
+
+    function onScroll() {
+      const y = window.scrollY;
+      const prev = lastScrollY.current;
+      const delta = y - prev;
+
+      // Hide secondary nav when scrolling down; show near top or on scroll up.
+      if (y < 24) {
+        setNavHidden(false);
+      } else if (delta > 6) {
+        setNavHidden(true);
+        setOpen(null);
+      } else if (delta < -6) {
+        setNavHidden(false);
+      }
+
+      lastScrollY.current = y;
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -141,6 +141,7 @@ export function SiteHeader() {
     setOpen(null);
     setAccountOpen(false);
     setMobileOpen(false);
+    setSearchOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -192,194 +193,96 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--paper)]/95 backdrop-blur">
-      <div className="overflow-x-clip border-b border-[var(--line)] bg-[var(--ink)] text-xs text-slate-300">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-1.5 sm:px-6">
-          <p className="min-w-0 truncate">
-            Nahda Publications | Peer reviewed journals
+    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-white">
+      {/* Utility row — Nature style */}
+      <div className="border-b border-[var(--line)] bg-[var(--surface)]">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-2 sm:px-6">
+          <p className="hidden text-xs text-[var(--muted)] sm:block">
+            Peer-reviewed journals · Open scholarship
           </p>
-          <div className="hidden items-center gap-4 sm:flex">
-            <Link href="/search" className="hover:text-white">
-              Search articles
+          <div className="ml-auto flex items-center gap-4 text-sm text-[var(--ink)]">
+            <Link href="/journals" className="hidden hover:underline sm:inline">
+              View all journals
             </Link>
-            <Link href="/help" className="hover:text-white">
-              Support
-            </Link>
+            <button
+              type="button"
+              className="hover:underline"
+              onClick={() => setSearchOpen((v) => !v)}
+              aria-expanded={searchOpen}
+            >
+              Search
+            </button>
+            {ready && user ? (
+              <>
+                <AuthorNotifications />
+                <div className="relative" ref={accountRef}>
+                  <button
+                    type="button"
+                    onClick={() => setAccountOpen((v) => !v)}
+                    className="inline-flex items-center gap-1.5 hover:underline"
+                  >
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[10px] font-bold text-[var(--accent)]">
+                      {initials(user.name)}
+                    </span>
+                    <span className="hidden sm:inline">{user.name.split(" ")[0]}</span>
+                  </button>
+                  {accountOpen && (
+                    <div className="absolute right-0 top-full z-50 mt-1 w-56 border border-[var(--line)] bg-white p-1 shadow-md">
+                      <Link href="/dashboard" className="menu-link">
+                        My dashboard
+                      </Link>
+                      <Link href="/profile" className="menu-link">
+                        My profile
+                      </Link>
+                      <Link href="/notifications" className="menu-link">
+                        Notifications
+                      </Link>
+                      <button
+                        type="button"
+                        className="menu-link w-full text-left text-rose-700"
+                        onClick={handleSignOut}
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <Link href="/login" className="font-semibold hover:underline">
+                Log in
+              </Link>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="mx-auto flex h-14 w-full max-w-6xl min-w-0 items-center justify-between gap-2 px-3 sm:px-6 lg:h-16 lg:gap-3">
-        <BrandLogo
-          variant="full"
-          priority
-          className="!max-w-[min(108px,28vw)] lg:!max-w-[min(200px,52vw)]"
-        />
-
-        <div className="min-w-0 flex-1 lg:hidden">
-          <Suspense
-            fallback={
-              <div className="h-9 rounded-full border border-[var(--line)] bg-white" />
-            }
-          >
-            <NavbarSearch variant="bar" />
-          </Suspense>
+      {searchOpen && (
+        <div className="border-b border-[var(--line)] bg-white">
+          <div className="mx-auto max-w-[1200px] px-4 py-3 sm:px-6">
+            <Suspense fallback={<div className="h-9 bg-[var(--surface)]" />}>
+              <NavbarSearch variant="bar" />
+            </Suspense>
+          </div>
         </div>
+      )}
 
-        <nav ref={navRef} className="relative hidden items-center gap-0.5 lg:flex">
-          {nav.map((item) => {
-            const isOpen = open === item.label;
-            const active =
-              pathname === item.href ||
-              pathname.startsWith(`${item.href}/`) ||
-              item.children.some((c) => {
-                const base = c.href.split("?")[0];
-                return pathname === base || pathname.startsWith(`${base}/`);
-              });
-
-            return (
-              <div
-                key={item.label}
-                className="group relative"
-                onMouseEnter={() => {
-                  if (hydrated.current) setOpen(item.label);
-                }}
-                onMouseLeave={() => setOpen(null)}
-              >
-                <div
-                  className={`flex items-center rounded-md transition ${
-                    active
-                      ? "bg-[var(--surface)] text-[var(--ink)]"
-                      : "text-[var(--muted)] group-hover:bg-[var(--surface)] group-hover:text-[var(--ink)]"
-                  }`}
-                >
-                  <Link
-                    href={item.href}
-                    className="px-3 py-2 text-sm font-medium"
-                  >
-                    {item.label}
-                  </Link>
-                  <button
-                    type="button"
-                    className="pr-2.5 pl-0.5 py-2"
-                    aria-label={`${item.label} menu`}
-                    aria-expanded={isOpen}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (!hydrated.current) return;
-                      setOpen((prev) =>
-                        prev === item.label ? null : item.label,
-                      );
-                    }}
-                  >
-                    <Chevron open={isOpen} />
-                  </button>
-                </div>
-
-                {isOpen && (
-                  <div className="absolute left-0 top-full z-50 pt-1">
-                    <div className="w-72 rounded-xl border border-[var(--line)] bg-white p-2 shadow-lg">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.href + child.label}
-                          href={child.href}
-                          className="block rounded-lg px-3 py-2.5 hover:bg-[var(--surface)]"
-                        >
-                          <span className="block text-sm font-medium text-[var(--ink)]">
-                            {child.label}
-                          </span>
-                          {child.hint && (
-                            <span className="mt-0.5 block text-xs text-[var(--muted)]">
-                              {child.hint}
-                            </span>
-                          )}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </nav>
+      {/* Brand + primary nav */}
+      <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4">
+        <BrandLogo variant="full" priority />
 
         <div className="flex items-center gap-2">
-          {!ready ? (
-            <div className="h-9 w-20 animate-pulse rounded-lg bg-[var(--surface)]" />
-          ) : user ? (
-            <>
-              <AuthorNotifications />
-              <div className="relative" ref={accountRef}>
-              <button
-                type="button"
-                onClick={() => {
-                  setAccountOpen((v) => !v);
-                  setOpen(null);
-                }}
-                className="flex items-center gap-2 rounded-lg border border-[var(--line)] bg-white py-1.5 pl-1.5 pr-2.5 text-left hover:bg-[var(--surface)]"
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xs font-semibold text-[var(--accent)]">
-                  {initials(user.name)}
-                </span>
-                <span className="hidden sm:block">
-                  <span className="block max-w-[120px] truncate text-xs font-medium text-[var(--ink)]">
-                    {user.name}
-                  </span>
-                  <span className="block text-[10px] capitalize text-[var(--muted)]">
-                    {user.role}
-                  </span>
-                </span>
-                <Chevron open={accountOpen} />
-              </button>
-              {accountOpen && (
-                <div className="absolute right-0 top-full z-50 mt-1 w-60 rounded-xl border border-[var(--line)] bg-white p-2 shadow-lg">
-                  <div className="border-b border-[var(--line)] px-3 py-2">
-                    <p className="truncate text-sm font-medium">{user.name}</p>
-                    <p className="truncate text-xs text-[var(--muted)]">
-                      {user.email}
-                    </p>
-                  </div>
-                  <Link href="/dashboard" className="menu-link">
-                    My dashboard
-                  </Link>
-                  <Link href="/profile" className="menu-link">
-                    My profile
-                  </Link>
-                  <Link href="/notifications" className="menu-link">
-                    Notifications
-                  </Link>
-                  <button
-                    type="button"
-                    className="menu-link w-full text-left text-rose-700"
-                    onClick={handleSignOut}
-                  >
-                    Sign out
-                  </button>
-                </div>
-              )}
-            </div>
-            </>
-          ) : (
-            <div className="hidden items-center gap-2 lg:flex">
-              <Link href="/login" className="btn-secondary !px-3 !py-2 text-sm">
-                Sign in
-              </Link>
-              <Link
-                href="/register"
-                className="btn-primary !px-3 !py-2 text-sm"
-              >
-                Register
-              </Link>
-            </div>
-          )}
-
+          {!ready ? null : !user ? (
+            <Link
+              href="/register"
+              className="hidden text-sm font-bold text-[var(--accent)] hover:underline lg:inline"
+            >
+              Register
+            </Link>
+          ) : null}
           <button
             type="button"
-            className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border transition lg:hidden ${
-              mobileOpen
-                ? "border-[var(--accent)]/30 bg-[var(--accent-soft)] text-[var(--accent)]"
-                : "border-[var(--line)] bg-white text-[var(--ink)]"
-            }`}
+            className="inline-flex h-10 w-10 items-center justify-center border border-[var(--line)] text-[var(--ink)] lg:hidden"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
@@ -389,20 +292,109 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="hidden border-t border-[var(--line)] bg-white lg:block">
-        <div className="mx-auto max-w-6xl px-3 py-2.5 sm:px-6 sm:py-2">
-          <Suspense fallback={<div className="h-9" />}>
-            <NavbarSearch variant="header" />
-          </Suspense>
+      <nav
+        ref={navRef}
+        aria-hidden={navHidden}
+        className={`hidden overflow-hidden border-t border-[var(--line)] transition-[max-height,opacity,border-color] duration-300 ease-out lg:block ${
+          navHidden
+            ? "max-h-0 border-transparent opacity-0 pointer-events-none"
+            : "max-h-16 opacity-100"
+        }`}
+      >
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">
+          <div className="flex items-center">
+            {nav.map((item) => {
+              const isOpen = open === item.label;
+              const active =
+                pathname === item.href ||
+                pathname.startsWith(`${item.href}/`) ||
+                item.children.some((c) => {
+                  const base = c.href.split("?")[0];
+                  return pathname === base || pathname.startsWith(`${base}/`);
+                });
+
+              return (
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => {
+                    if (hydrated.current && !navHidden) setOpen(item.label);
+                  }}
+                  onMouseLeave={() => setOpen(null)}
+                >
+                  <div
+                    className={`flex items-center ${
+                      isOpen
+                        ? "bg-[#dceaf2] text-[var(--ink)]"
+                        : active
+                          ? "border-b-2 border-[var(--accent)]"
+                          : "border-b-2 border-transparent"
+                    }`}
+                  >
+                    <Link
+                      href={item.href}
+                      className="px-3 py-3 text-[0.92rem] font-bold"
+                    >
+                      {item.label}
+                    </Link>
+                    <button
+                      type="button"
+                      className="pr-3 pl-0 py-3"
+                      aria-label={`${item.label} menu`}
+                      aria-expanded={isOpen}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (!hydrated.current || navHidden) return;
+                        setOpen((prev) =>
+                          prev === item.label ? null : item.label,
+                        );
+                      }}
+                    >
+                      <Chevron open={isOpen} />
+                    </button>
+                  </div>
+
+                  {isOpen && !navHidden && (
+                    <div className="absolute left-0 top-full z-50 pt-0">
+                      {/* Nature-style dropdown: black panel, white underlined links */}
+                      <div className="min-w-[20rem] max-w-[28rem] bg-black px-5 py-4">
+                        {item.children.map((child) => (
+                          <Link
+                            key={child.href + child.label}
+                            href={child.href}
+                            className="block py-2 text-[0.95rem] font-bold leading-snug text-white underline decoration-1 underline-offset-[0.2em] transition hover:text-[#e8a0b2]"
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            <Link
+              href="/submissions/new"
+              className="ml-1 px-3 py-3 text-sm font-bold text-[var(--accent)] hover:underline"
+            >
+              Submit
+            </Link>
+          </div>
+          <Link
+            href="/authors/guidelines"
+            className="hidden text-sm text-[var(--muted)] hover:text-[var(--ink)] hover:underline xl:inline"
+          >
+            Guide to authors
+          </Link>
         </div>
-      </div>
+      </nav>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-[60] lg:hidden">
           <button
             type="button"
             aria-label="Close menu"
-            className="absolute inset-0 bg-[var(--ink)]/45 backdrop-blur-sm"
+            className="absolute inset-0 bg-[var(--ink)]/45"
             onClick={() => setMobileOpen(false)}
           />
 
@@ -413,41 +405,33 @@ export function SiteHeader() {
             className="absolute inset-y-0 right-0 flex h-dvh w-full max-w-sm flex-col bg-white shadow-2xl"
           >
             <div className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-[var(--line)] px-4">
-              <BrandLogo variant="full" className="!max-w-[150px]" />
+              <BrandLogo variant="full" />
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
                 aria-label="Close menu"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--line)] text-[var(--ink)]"
+                className="inline-flex h-10 w-10 items-center justify-center border border-[var(--line)] text-[var(--ink)]"
               >
                 <HamburgerIcon open />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-4">
-              <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
-                Menu
-              </p>
+            <div className="border-b border-[var(--line)] px-3 py-3">
+              <Suspense fallback={<div className="h-9 bg-[var(--surface)]" />}>
+                <NavbarSearch variant="bar" />
+              </Suspense>
+            </div>
 
+            <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-4">
               <nav className="space-y-1">
                 {nav.map((item) => {
                   const sectionOpen = mobileSection === item.label;
-                  const active =
-                    pathname === item.href ||
-                    pathname.startsWith(`${item.href}/`) ||
-                    item.children.some((c) => {
-                      const base = c.href.split("?")[0];
-                      return pathname === base || pathname.startsWith(`${base}/`);
-                    });
-
                   return (
                     <div key={item.label}>
                       <button
                         type="button"
-                        className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-3 text-left transition ${
-                          sectionOpen || active
-                            ? "bg-[var(--accent-soft)]"
-                            : "hover:bg-[var(--surface)]"
+                        className={`flex w-full items-center justify-between gap-3 px-3 py-3 text-left ${
+                          sectionOpen ? "bg-[var(--accent-soft)]" : "hover:bg-[var(--surface)]"
                         }`}
                         aria-expanded={sectionOpen}
                         onClick={() =>
@@ -457,10 +441,8 @@ export function SiteHeader() {
                         }
                       >
                         <span
-                          className={`text-[15px] font-semibold ${
-                            sectionOpen || active
-                              ? "text-[var(--accent)]"
-                              : "text-[var(--ink)]"
+                          className={`text-[15px] font-bold ${
+                            sectionOpen ? "text-[var(--accent)]" : "text-[var(--ink)]"
                           }`}
                         >
                           {item.label}
@@ -470,18 +452,11 @@ export function SiteHeader() {
 
                       {sectionOpen && (
                         <div className="mt-1 ml-3 space-y-0.5 border-l border-[var(--line)] pl-3">
-                          <Link
-                            href={item.href}
-                            className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-[var(--accent)] transition hover:bg-[var(--surface)]"
-                            onClick={() => setMobileOpen(false)}
-                          >
-                            View all {item.label.toLowerCase()}
-                          </Link>
                           {item.children.map((child) => (
                             <Link
                               key={child.href + child.label}
                               href={child.href}
-                              className="block rounded-lg px-3 py-2.5 text-sm text-[var(--ink)] transition hover:bg-[var(--surface)]"
+                              className="block px-3 py-2.5 text-sm text-[var(--ink)] hover:bg-[var(--surface)]"
                               onClick={() => setMobileOpen(false)}
                             >
                               {child.label}
@@ -497,42 +472,34 @@ export function SiteHeader() {
 
             <div className="shrink-0 border-t border-[var(--line)] bg-white p-4">
               {user ? (
-                <>
-                  <p className="truncate text-sm font-semibold text-[var(--ink)]">
-                    {user.name}
-                  </p>
-                  <p className="truncate text-xs text-[var(--muted)]">
-                    {user.email}
-                  </p>
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    <Link
-                      href="/dashboard"
-                      className="rounded-xl bg-[var(--surface)] px-3 py-2.5 text-center text-sm font-semibold text-[var(--ink)]"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <button
-                      type="button"
-                      className="rounded-xl bg-rose-50 px-3 py-2.5 text-sm font-semibold text-rose-700"
-                      onClick={handleSignOut}
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                </>
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/dashboard"
+                    className="bg-[var(--surface)] px-3 py-2.5 text-center text-sm font-bold text-[var(--ink)]"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    type="button"
+                    className="bg-rose-50 px-3 py-2.5 text-sm font-bold text-rose-700"
+                    onClick={handleSignOut}
+                  >
+                    Sign out
+                  </button>
+                </div>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
                   <Link
                     href="/login"
-                    className="rounded-xl border border-[var(--line)] px-3 py-3 text-center text-sm font-semibold text-[var(--ink)]"
+                    className="border border-[var(--line)] px-3 py-3 text-center text-sm font-bold text-[var(--ink)]"
                     onClick={() => setMobileOpen(false)}
                   >
-                    Sign in
+                    Log in
                   </Link>
                   <Link
                     href="/register"
-                    className="rounded-xl bg-[var(--accent)] px-3 py-3 text-center text-sm font-semibold text-white"
+                    className="bg-[var(--accent)] px-3 py-3 text-center text-sm font-bold text-white"
                     onClick={() => setMobileOpen(false)}
                   >
                     Register
@@ -551,17 +518,17 @@ function HamburgerIcon({ open }: { open: boolean }) {
   return (
     <span className="relative block h-3.5 w-4" aria-hidden>
       <span
-        className={`absolute left-0 block h-0.5 w-4 rounded-full bg-current transition duration-200 ${
+        className={`absolute left-0 block h-0.5 w-4 bg-current transition duration-200 ${
           open ? "top-1.5 rotate-45" : "top-0"
         }`}
       />
       <span
-        className={`absolute left-0 top-1.5 block h-0.5 w-4 rounded-full bg-current transition duration-200 ${
+        className={`absolute left-0 top-1.5 block h-0.5 w-4 bg-current transition duration-200 ${
           open ? "scale-x-0 opacity-0" : "opacity-100"
         }`}
       />
       <span
-        className={`absolute left-0 block h-0.5 w-4 rounded-full bg-current transition duration-200 ${
+        className={`absolute left-0 block h-0.5 w-4 bg-current transition duration-200 ${
           open ? "top-1.5 -rotate-45" : "top-3"
         }`}
       />
@@ -600,12 +567,13 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="mt-auto max-w-[100%] overflow-x-clip border-t border-[var(--line)] bg-[var(--ink)] text-slate-300">
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:grid-cols-2 sm:gap-8 sm:px-6 sm:py-12 lg:grid-cols-4">
+    <footer className="mt-auto max-w-[100%] overflow-x-clip border-t border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]">
+      <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-10 sm:grid-cols-2 sm:px-6 sm:py-12 lg:grid-cols-4">
         <div>
-          <BrandLogo href="/" variant="onDark" className="h-10 sm:h-11" />
-          <p className="mt-3 text-sm leading-relaxed text-slate-400">
-            Submission and publishing for researchers worldwide.
+          <BrandLogo href="/" variant="full" className="h-10 sm:h-11" />
+          <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">
+            A research publishing house for peer-reviewed open scholarship
+            across the sciences.
           </p>
         </div>
         <FooterCol
@@ -634,24 +602,24 @@ export function SiteFooter() {
             ["/help", "Help & FAQ"],
             ["/terms", "Terms & Conditions"],
             ["/privacy", "Privacy Policy"],
-            ["/login", "Sign in"],
+            ["/login", "Log in"],
           ]}
         />
       </div>
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© 2026 Nahda Publications.</p>
+      <div className="border-t border-[var(--line)] bg-white">
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-2 px-4 py-4 text-xs text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <p>© 2026 PSI Publications.</p>
           <p className="flex flex-wrap gap-x-3 gap-y-1">
-            <Link href="/terms" className="hover:text-white">
+            <Link href="/terms" className="hover:text-[var(--ink)] hover:underline">
               Terms
             </Link>
-            <Link href="/privacy" className="hover:text-white">
+            <Link href="/privacy" className="hover:text-[var(--ink)] hover:underline">
               Privacy
             </Link>
-            <Link href="/help" className="hover:text-white">
+            <Link href="/help" className="hover:text-[var(--ink)] hover:underline">
               FAQ
             </Link>
-            <Link href="/about" className="hover:text-white">
+            <Link href="/about" className="hover:text-[var(--ink)] hover:underline">
               About
             </Link>
           </p>
@@ -670,11 +638,14 @@ function FooterCol({
 }) {
   return (
     <div>
-      <p className="text-sm font-semibold text-white">{title}</p>
+      <p className="text-sm font-bold text-[var(--ink)]">{title}</p>
       <ul className="mt-3 space-y-2">
         {links.map(([href, label]) => (
           <li key={href}>
-            <Link href={href} className="text-sm text-slate-400 hover:text-white">
+            <Link
+              href={href}
+              className="text-sm text-[var(--muted)] hover:text-[var(--ink)] hover:underline"
+            >
               {label}
             </Link>
           </li>

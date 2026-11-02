@@ -46,7 +46,7 @@ type Props = {
   issueHref?: string | null;
 };
 
-function NahdaMark() {
+function PSIMark() {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -133,7 +133,7 @@ export function ArticleMasthead({
 
   return (
     <header className="bg-white">
-      {/* Top: Nahda logo + OA / license */}
+      {/* Top: PSI logo + OA / license */}
       <div
         className={`mx-auto flex max-w-6xl items-start justify-between gap-4 pt-6 ${
           embedded ? "px-5 sm:px-8" : "px-4 sm:px-6"
@@ -144,15 +144,15 @@ export function ArticleMasthead({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoUrl}
-              alt="Nahda Publications"
+              alt="PSI Publications"
               className="h-12 w-auto max-w-[140px] object-contain"
             />
           ) : (
-            <NahdaMark />
+            <PSIMark />
           )}
           <div className="min-w-0">
             <p className="font-[family-name:var(--font-display)] text-[1.15rem] leading-tight tracking-tight text-[var(--ink)] sm:text-[1.35rem]">
-              <span className="font-bold text-[var(--accent)]">Nahda</span>{" "}
+              <span className="font-bold text-[var(--accent)]">PSI</span>{" "}
               <span className="font-semibold">
                 {journalShortTitle || journalTitle}
               </span>

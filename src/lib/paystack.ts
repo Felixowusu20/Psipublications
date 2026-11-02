@@ -1,5 +1,5 @@
 import { getAppBaseUrl } from "@/lib/app-url";
-import { NAHDA_MERCHANT_NAME } from "@/lib/payment-display";
+import { PSI_MERCHANT_NAME } from "@/lib/payment-display";
 import {
   INTERNAL_PAYSTACK_CURRENCY,
   formatCustomerUsd,
@@ -251,7 +251,7 @@ export async function initializePaystackTransaction(opts: {
         metadata: {
           ...opts.metadata,
           usdCents: String(opts.usdCents),
-          merchant: NAHDA_MERCHANT_NAME,
+          merchant: PSI_MERCHANT_NAME,
           cancel_action: opts.callbackUrl.replace(
             "payment=success",
             "payment=cancelled",
@@ -348,7 +348,7 @@ export type ChargeCardInput = {
 };
 
 /**
- * Direct card charge (custom Nahda checkout). Card data is forwarded to Paystack
+ * Direct card charge (custom PSI checkout). Card data is forwarded to Paystack
  * only — never persisted. May return send_pin / send_otp / open_url / success.
  */
 export async function chargePaystackCard(
@@ -369,7 +369,7 @@ export async function chargePaystackCard(
   if (input.metadata) {
     body.metadata = {
       ...input.metadata,
-      merchant: input.metadata.merchant || NAHDA_MERCHANT_NAME,
+      merchant: input.metadata.merchant || PSI_MERCHANT_NAME,
     };
   }
 

@@ -30,8 +30,8 @@ export async function getDoiSettings(
         data: {
           prefix: DEFAULT_NID_PREFIX,
           label:
-            existing.label === "Nahda DOI" || existing.label.includes("DOI")
-              ? "Nahda Identifier (NID)"
+            existing.label === "PSI DOI" || existing.label.includes("DOI")
+              ? "PSI Identifier (NID)"
               : existing.label,
         },
       });
@@ -42,10 +42,10 @@ export async function getDoiSettings(
     data: {
       id: "default",
       prefix: DEFAULT_NID_PREFIX,
-      label: "Nahda Identifier (NID)",
-      publisherName: "Nahda Publications",
+      label: "PSI Identifier (NID)",
+      publisherName: "PSI Publications",
       notes:
-        "Free NIDs minted by Nahda for published articles. Not Crossref DOIs.",
+        "Free NIDs minted by PSI for published articles. Not Crossref DOIs.",
     },
   });
 }

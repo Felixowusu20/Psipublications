@@ -1,6 +1,6 @@
 /**
  * Client helpers for API responses + direct Cloudinary uploads.
- * Direct upload avoids production "Request Entity Too Large" on Vercel.
+ * Direct upload avoids production "Request Entity Too Large" body limits.
  */
 
 import {

@@ -51,7 +51,7 @@ export async function generateMetadata({
   } catch (err) {
     console.error("[article-metadata]", err);
   }
-  return { title: "Article not found | Nahda Publications" };
+  return { title: "Article not found | PSI Publications" };
 }
 
 function formatDate(value: Date | string | null | undefined) {
@@ -462,7 +462,7 @@ function ArticleView({
                     <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--muted)]">
                       This page presents the title, authors, affiliations,
                       abstract, keywords, NID, and publication history.
-                      Open the Nahda-formatted PDF for figures, tables,
+                      Open the PSI-formatted PDF for figures, tables,
                       methods, and the full reference list.
                     </p>
                     {viewHref ? (
@@ -533,7 +533,7 @@ function ArticleView({
                   </div>
                   <div className="p-5">
                     <p className="text-xs leading-relaxed text-[var(--muted)]">
-                      Includes figures, tables, and references in the Nahda
+                      Includes figures, tables, and references in the PSI
                       article format.
                     </p>
                     {viewHref ? (
