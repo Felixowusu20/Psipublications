@@ -7,16 +7,16 @@ type Props = {
   className?: string;
 };
 
-const SIZES: Record<Variant, { box: string; icon: string; text: string }> = {
-  screen: { box: "h-24 w-24", icon: "h-14 w-14", text: "text-base" },
-  dark: { box: "h-24 w-24", icon: "h-14 w-14", text: "text-base" },
-  panel: { box: "h-16 w-16", icon: "h-9 w-9", text: "text-sm" },
-  inline: { box: "h-10 w-10", icon: "h-6 w-6", text: "text-sm" },
+const SIZES: Record<Variant, { ring: string; glyph: string; text: string }> = {
+  screen: { ring: "h-16 w-16", glyph: "text-2xl", text: "text-base" },
+  dark: { ring: "h-16 w-16", glyph: "text-2xl", text: "text-base" },
+  panel: { ring: "h-12 w-12", glyph: "text-xl", text: "text-sm" },
+  inline: { ring: "h-8 w-8", glyph: "text-base", text: "text-sm" },
 };
 
 /**
- * Brand loading state: the PSI favicon pumping inside pulsing rings.
- * Safe in server components — animation is pure CSS.
+ * PSI brand loader — thin editorial spinner + serif Ψ mark.
+ * Distinct from the old Nahda favicon-pump / sliding bar treatment.
  */
 export function PSILoader({ label, variant = "panel", className }: Props) {
   const size = SIZES[variant];
@@ -24,10 +24,10 @@ export function PSILoader({ label, variant = "panel", className }: Props) {
 
   const wrapper =
     variant === "screen" || variant === "dark"
-      ? "flex min-h-[60vh] w-full flex-col items-center justify-center gap-5 px-6 py-16"
+      ? "flex min-h-[60vh] w-full flex-col items-center justify-center gap-4 px-6 py-16"
       : variant === "panel"
-        ? "flex w-full flex-col items-center justify-center gap-4 px-6 py-12"
-        : "flex w-full items-center justify-center gap-3 px-4 py-6";
+        ? "flex w-full flex-col items-center justify-center gap-3.5 px-6 py-12"
+        : "flex w-full items-center justify-center gap-3 px-4 py-5";
 
   const isRow = variant === "inline";
 
@@ -37,40 +37,48 @@ export function PSILoader({ label, variant = "panel", className }: Props) {
       role="status"
       aria-live="polite"
     >
-      <div className={`relative flex ${size.box} items-center justify-center`}>
+      <div
+        className={`relative flex ${size.ring} items-center justify-center`}
+        aria-hidden
+      >
+        {/* Outer thin arc — spins */}
         <span
-          className={`absolute inset-0 animate-ping rounded-full ${
-            onDark ? "bg-white/20" : "bg-[var(--accent)]/25"
+          className={`psi-spinner-ring absolute inset-0 rounded-full border-[1.5px] ${
+            onDark
+              ? "border-white/15 border-t-white border-r-white/60"
+              : "border-[var(--accent)]/15 border-t-[var(--accent)] border-r-[var(--accent)]/70"
           }`}
-          aria-hidden
+        />
+        {/* Inner counter-arc */}
+        <span
+          className={`psi-spinner-ring-rev absolute inset-[18%] rounded-full border ${
+            onDark
+              ? "border-transparent border-b-[#e8a0b2]/80"
+              : "border-transparent border-b-[var(--accent)]/55"
+          }`}
         />
         <span
-          className={`absolute inset-[12%] animate-pulse rounded-full ${
-            onDark ? "bg-white/10" : "bg-[var(--accent)]/15"
+          className={`relative font-[family-name:var(--font-display)] font-bold leading-none ${size.glyph} ${
+            onDark ? "text-white" : "text-[var(--accent)]"
           }`}
-          aria-hidden
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/favicon.png"
-          alt=""
-          className={`nahda-favicon-pump relative ${size.icon} rounded-2xl object-contain shadow-lg ${
-            onDark ? "ring-1 ring-white/25" : "ring-1 ring-[var(--accent)]/20"
-          }`}
-        />
+        >
+          ψ
+        </span>
       </div>
 
       <div className={isRow ? "text-left" : "text-center"}>
+        {!isRow && (
+          <p
+            className={`font-[family-name:var(--font-display)] text-[0.95rem] font-bold tracking-tight ${
+              onDark ? "text-white" : "text-[var(--ink)]"
+            }`}
+          >
+            psi
+          </p>
+        )}
         <p
-          className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
-            onDark ? "text-[#e8a0b2]" : "text-[var(--accent)]"
-          }`}
-        >
-          PSI Publications
-        </p>
-        <p
-          className={`mt-1 ${size.text} ${
-            onDark ? "text-white/80" : "text-[var(--muted)]"
+          className={`${isRow ? "" : "mt-0.5"} ${size.text} ${
+            onDark ? "text-white/70" : "text-[var(--muted)]"
           }`}
         >
           {label ?? "Loading…"}
@@ -78,13 +86,22 @@ export function PSILoader({ label, variant = "panel", className }: Props) {
       </div>
 
       {!isRow && (
-        <div
-          className={`h-1 w-40 overflow-hidden rounded-full ${
-            onDark ? "bg-white/15" : "bg-[var(--surface)]"
-          }`}
-          aria-hidden
-        >
-          <div className="nahda-load-bar h-full w-1/2 rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--brand-orange)]" />
+        <div className="psi-loader-dots flex items-center gap-1.5" aria-hidden>
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              onDark ? "bg-[#e8a0b2]" : "bg-[var(--accent)]"
+            }`}
+          />
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              onDark ? "bg-[#e8a0b2]" : "bg-[var(--accent)]"
+            }`}
+          />
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              onDark ? "bg-[#e8a0b2]" : "bg-[var(--accent)]"
+            }`}
+          />
         </div>
       )}
     </div>

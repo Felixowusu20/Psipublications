@@ -53,30 +53,27 @@ export function PaystackBrandOverlay({ open, status, amountLabel }: Props) {
       {!paystackVisible ? (
         <div className="relative flex flex-1 flex-col items-center justify-center px-6 pb-16 pt-10 text-center">
           <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(30,104,71,0.35),_transparent_60%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(110,31,58,0.4),_transparent_60%)]"
             aria-hidden
           />
 
           <div className="relative flex flex-col items-center">
-            <div className="relative mb-6 flex h-24 w-24 items-center justify-center">
-              <span className="absolute inset-0 animate-ping rounded-full bg-[var(--accent)]/30" />
-              <span className="absolute inset-2 animate-pulse rounded-full bg-[var(--accent)]/20" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/favicon.png"
-                alt=""
-                className="nahda-favicon-pump relative h-16 w-16 rounded-2xl object-cover shadow-xl ring-2 ring-white/30"
-              />
+            <div className="relative mb-6 flex h-16 w-16 items-center justify-center">
+              <span className="psi-spinner-ring absolute inset-0 rounded-full border-[1.5px] border-white/15 border-t-white border-r-white/60" />
+              <span className="psi-spinner-ring-rev absolute inset-[18%] rounded-full border border-transparent border-b-[#e8a0b2]/80" />
+              <span className="relative font-[family-name:var(--font-display)] text-2xl font-bold leading-none text-white">
+                ψ
+              </span>
             </div>
 
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a0b2]">
-              PSI Publications
+            <p className="font-[family-name:var(--font-display)] text-lg font-bold tracking-tight text-white">
+              psi
             </p>
             <h2 className="mt-2 max-w-sm font-[family-name:var(--font-display)] text-2xl text-white sm:text-3xl">
               {message}
             </h2>
             {amountLabel ? (
-              <p className="mt-3 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-white ring-1 ring-white/15">
+              <p className="mt-3 rounded-sm bg-white/10 px-4 py-1.5 text-sm font-semibold text-white ring-1 ring-white/15">
                 APC due: {amountLabel} USD
               </p>
             ) : null}
@@ -85,8 +82,10 @@ export function PaystackBrandOverlay({ open, status, amountLabel }: Props) {
               window until checkout finishes.
             </p>
 
-            <div className="mt-8 h-1.5 w-48 overflow-hidden rounded-full bg-white/10">
-              <div className="nahda-load-bar h-full w-1/2 rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--brand-orange)]" />
+            <div className="psi-loader-dots mt-8 flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#e8a0b2]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#e8a0b2]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#e8a0b2]" />
             </div>
           </div>
         </div>

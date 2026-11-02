@@ -82,39 +82,12 @@ export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSection, setMobileSection] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [navHidden, setNavHidden] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
   const hydrated = useRef(false);
-  const lastScrollY = useRef(0);
 
   useEffect(() => {
     hydrated.current = true;
-  }, []);
-
-  useEffect(() => {
-    lastScrollY.current = window.scrollY;
-
-    function onScroll() {
-      const y = window.scrollY;
-      const prev = lastScrollY.current;
-      const delta = y - prev;
-
-      // Hide secondary nav when scrolling down; show near top or on scroll up.
-      if (y < 24) {
-        setNavHidden(false);
-      } else if (delta > 6) {
-        setNavHidden(true);
-        setOpen(null);
-      } else if (delta < -6) {
-        setNavHidden(false);
-      }
-
-      lastScrollY.current = y;
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -294,12 +267,7 @@ export function SiteHeader() {
 
       <nav
         ref={navRef}
-        aria-hidden={navHidden}
-        className={`hidden overflow-hidden border-t border-[var(--line)] transition-[max-height,opacity,border-color] duration-300 ease-out lg:block ${
-          navHidden
-            ? "max-h-0 border-transparent opacity-0 pointer-events-none"
-            : "max-h-16 opacity-100"
-        }`}
+        className="hidden border-t border-[var(--line)] lg:block"
       >
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex items-center">
@@ -318,7 +286,7 @@ export function SiteHeader() {
                   key={item.label}
                   className="relative"
                   onMouseEnter={() => {
-                    if (hydrated.current && !navHidden) setOpen(item.label);
+                    if (hydrated.current) setOpen(item.label);
                   }}
                   onMouseLeave={() => setOpen(null)}
                 >
@@ -344,7 +312,7 @@ export function SiteHeader() {
                       aria-expanded={isOpen}
                       onClick={(e) => {
                         e.preventDefault();
-                        if (!hydrated.current || navHidden) return;
+                        if (!hydrated.current) return;
                         setOpen((prev) =>
                           prev === item.label ? null : item.label,
                         );
@@ -354,7 +322,7 @@ export function SiteHeader() {
                     </button>
                   </div>
 
-                  {isOpen && !navHidden && (
+                  {isOpen && (
                     <div className="absolute left-0 top-full z-50 pt-0">
                       {/* Nature-style dropdown: black panel, white underlined links */}
                       <div className="min-w-[20rem] max-w-[28rem] bg-black px-5 py-4">

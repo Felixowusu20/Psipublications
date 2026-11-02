@@ -33,7 +33,7 @@ function drawPulsingFavicon(
   // Ring progress
   ctx.beginPath();
   ctx.arc(size / 2, size / 2, size / 2 - 2, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(30, 104, 71, ${0.12 + 0.18 * pulse})`;
+  ctx.fillStyle = `rgba(110, 31, 58, ${0.12 + 0.18 * pulse})`;
   ctx.fill();
 
   ctx.save();
@@ -66,7 +66,7 @@ function drawPulsingFavicon(
     -Math.PI / 2 + progress * Math.PI * 2 - 0.15,
     -Math.PI / 2 + progress * Math.PI * 2,
   );
-  ctx.strokeStyle = "#d65c33";
+  ctx.strokeStyle = "#e8a0b2";
   ctx.lineWidth = 4;
   ctx.stroke();
 
