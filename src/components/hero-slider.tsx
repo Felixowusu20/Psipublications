@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const RESEARCH_FIELDS = [
   "Chemistry",
@@ -12,10 +15,41 @@ const RESEARCH_FIELDS = [
   "Computer Science",
 ] as const;
 
+const HERO_SLIDES = [
+  {
+    src: "/hero/slide-1.jpg",
+    alt: "Scientific research across chemistry, biology, physics, and related fields",
+  },
+  {
+    src: "/hero/slide-2.jpg",
+    alt: "Researchers collaborating in the laboratory",
+  },
+  {
+    src: "/hero/slide-3.jpg",
+    alt: "Open scholarship and peer-reviewed discovery",
+  },
+  {
+    src: "/hero/slide-4.jpg",
+    alt: "Global research and scientific publishing",
+  },
+] as const;
+
+const SLIDE_MS = 5500;
+
 /**
- * Nature-style split hero: editorial panel + one dominant research image.
+ * Nature-style split hero: static editorial panel + automatic image slide
+ * (no arrows, dots, or controls — same layout as the static image).
  */
 export function HeroSlider() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % HERO_SLIDES.length);
+    }, SLIDE_MS);
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <section
       className="nature-section-rule relative isolate max-w-[100%] overflow-x-clip bg-[var(--hero-panel)] text-white home-reveal"
@@ -65,15 +99,29 @@ export function HeroSlider() {
           </div>
         </div>
 
-        <div className="relative min-h-[14rem] sm:min-h-[20rem] lg:min-h-full">
-          <Image
-            src="/hero/slide-1.jpg"
-            alt="Scientific research across chemistry, biology, physics, and related fields"
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover object-center"
-          />
+        <div
+          className="relative min-h-[14rem] overflow-hidden sm:min-h-[20rem] lg:min-h-full"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {HERO_SLIDES.map((slide, i) => (
+            <div
+              key={slide.src}
+              className={`absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${
+                i === index ? "opacity-100" : "opacity-0"
+              }`}
+              aria-hidden={i !== index}
+            >
+              <Image
+                src={slide.src}
+                alt={i === index ? slide.alt : ""}
+                fill
+                priority={i === 0}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover object-center"
+              />
+            </div>
+          ))}
         </div>
       </div>
     </section>

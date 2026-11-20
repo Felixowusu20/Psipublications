@@ -1,4 +1,8 @@
 import { prisma } from "@/lib/db";
+import {
+  rebrandLegacyPublisherContentOnce,
+  scrubLegacyPublisherText,
+} from "@/lib/legacy-brand";
 
 export const CMS_PAGE_SLUGS = ["about", "terms", "privacy"] as const;
 export type CmsPageSlug = (typeof CMS_PAGE_SLUGS)[number];
@@ -184,6 +188,8 @@ const DEFAULT_PAGES: Record<
 
 /** Ensure default CMS rows exist (idempotent). Safe to call from public pages. */
 export async function ensureCmsDefaults() {
+  void rebrandLegacyPublisherContentOnce();
+
   for (const slug of CMS_PAGE_SLUGS) {
     const existing = await prisma.cmsPage.findUnique({ where: { slug } });
     if (!existing) {
@@ -208,20 +214,34 @@ export async function ensureCmsDefaults() {
 
 export async function getCmsPage(slug: CmsPageSlug) {
   await ensureCmsDefaults();
-  return prisma.cmsPage.findUnique({
+  const page = await prisma.cmsPage.findUnique({
     where: { slug },
     include: {
       images: { orderBy: { sortOrder: "asc" } },
     },
   });
+  if (!page) return null;
+  return {
+    ...page,
+    title: scrubLegacyPublisherText(page.title),
+    subtitle: page.subtitle
+      ? scrubLegacyPublisherText(page.subtitle)
+      : page.subtitle,
+    body: scrubLegacyPublisherText(page.body),
+  };
 }
 
 export async function listFaqs(activeOnly = true) {
   await ensureCmsDefaults();
-  return prisma.faqItem.findMany({
+  const faqs = await prisma.faqItem.findMany({
     where: activeOnly ? { isActive: true } : undefined,
     orderBy: { sortOrder: "asc" },
   });
+  return faqs.map((faq) => ({
+    ...faq,
+    question: scrubLegacyPublisherText(faq.question),
+    answer: scrubLegacyPublisherText(faq.answer),
+  }));
 }
 
 /** Split CMS body into paragraphs and bullet groups for safe HTML-free rendering. */

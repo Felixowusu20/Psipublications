@@ -26,6 +26,10 @@ import {
   parseAuthorOrcid,
 } from "@/lib/orcid";
 import { htmlToPlainText } from "@/lib/import-manuscript";
+import {
+  extractSupplementaryFromBody,
+  resolveSupplementaryHtml,
+} from "@/lib/supplementary";
 import { slugify } from "@/lib/submission-utils";
 import { RichTextField } from "@/components/rich-text-field";
 import { TemplateFormatToolbar } from "@/components/template-format-toolbar";
@@ -60,6 +64,8 @@ type QueueItem = {
   submittedAt: string;
   manuscriptUrl?: string | null;
   productionBody?: string | null;
+  productionSupplementary?: string | null;
+  productionSupplementaryUrl?: string | null;
   productionFigures?: ManuscriptFigure[] | null;
   manuscriptReadyAt?: string | null;
   funding?: string | null;
@@ -122,6 +128,8 @@ type TemplateForm = {
   isFeatured: boolean;
   logoUrl: string;
   body: string;
+  supplementary: string;
+  supplementaryUrl: string;
   figures: ManuscriptFigure[];
   pdfUrl: string;
 };
@@ -187,6 +195,8 @@ function emptyForm(): TemplateForm {
     isFeatured: true,
     logoUrl: "",
     body: "",
+    supplementary: "",
+    supplementaryUrl: "",
     figures: [],
     pdfUrl: "",
   };
@@ -318,6 +328,8 @@ export default function PublishedArticlesPage() {
     const payload: Record<string, unknown> = {
       submissionId: id,
       body: f.body,
+      supplementary: f.supplementary,
+      supplementaryUrl: f.supplementaryUrl || "",
       figures: f.figures,
       done: false,
       keywords: splitList(f.keywords, ","),
@@ -347,6 +359,8 @@ export default function PublishedArticlesPage() {
                 abstract: data.submission?.abstract ?? f.abstract.trim(),
                 keywords: data.submission?.keywords ?? q.keywords,
                 productionBody: f.body,
+                productionSupplementary: f.supplementary,
+                productionSupplementaryUrl: f.supplementaryUrl || null,
                 productionFigures: f.figures,
               }
             : q,
@@ -387,6 +401,10 @@ export default function PublishedArticlesPage() {
     const savedBody = sub.productionBody?.trim()
       ? sub.productionBody
       : emptyForm().body;
+    const savedSupplementary = resolveSupplementaryHtml({
+      supplementary: sub.productionSupplementary,
+      body: savedBody,
+    });
     // Title, abstract, keywords always come from the accepted submission
     const publishedAt = toDateInputValue(new Date());
     const placement = numberedIssuePlacement({
@@ -414,6 +432,8 @@ export default function PublishedArticlesPage() {
       isFeatured: true,
       logoUrl: sub.journal.coverImageUrl || "",
       body: savedBody,
+      supplementary: savedSupplementary,
+      supplementaryUrl: sub.productionSupplementaryUrl?.trim() || "",
       figures: parseFigures(sub.productionFigures),
       pdfUrl: "",
     });
@@ -768,6 +788,8 @@ export default function PublishedArticlesPage() {
         coverImageUrl:
           form.logoUrl || selected.journal.coverImageUrl || undefined,
         body: form.body || undefined,
+        supplementary: form.supplementary || undefined,
+        supplementaryUrl: form.supplementaryUrl || undefined,
         figures: form.figures.map((f) => ({
           url: f.url,
           filename: f.filename,
@@ -1443,6 +1465,112 @@ export default function PublishedArticlesPage() {
                         funding={selected.funding}
                         conflictOfInterest={selected.conflictOfInterest}
                       />
+                      </div>
+                    </div>
+
+                    <div className="overflow-hidden rounded-2xl border border-[var(--line)] bg-white p-4 shadow-sm sm:p-5 print:hidden">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
+                            Supplementary materials
+                          </p>
+                          <h3 className="mt-1 font-[family-name:var(--font-display)] text-lg text-[var(--ink)]">
+                            Bound to this article
+                          </h3>
+                          <p className="mt-1 max-w-2xl text-[12px] leading-relaxed text-[var(--muted)]">
+                            Readers open this from the article page as
+                            Supporting Information for this same paper only
+                            (<code className="text-[11px]">/articles/…/supplementary</code>
+                            ). Mark figures/tables as Supplementary in the body,
+                            or edit the HTML here.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          className="btn-secondary !px-3 !py-2 text-xs"
+                          onClick={() => {
+                            const pulled = extractSupplementaryFromBody(
+                              form.body,
+                            );
+                            if (!pulled.trim()) {
+                              setError(
+                                "No .nahda-supplementary blocks found in the article body yet.",
+                              );
+                              return;
+                            }
+                            setForm((f) => ({
+                              ...f,
+                              supplementary: pulled,
+                            }));
+                            setError("");
+                            setSuccess(
+                              "Pulled supplementary blocks from the article body.",
+                            );
+                          }}
+                        >
+                          Pull from article body
+                        </button>
+                      </div>
+                      <div className="mt-4">
+                        <RichTextField
+                          label="Supplementary HTML"
+                          value={form.supplementary}
+                          onChange={(next) =>
+                            setForm((f) => ({ ...f, supplementary: next }))
+                          }
+                          minHeight={220}
+                          hint="Tables, methods appendices, extra figures for this paper only."
+                        />
+                      </div>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+                        <label className="block text-sm">
+                          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
+                            Supplementary file URL (optional PDF/ZIP)
+                          </span>
+                          <input
+                            className="input w-full"
+                            value={form.supplementaryUrl}
+                            onChange={(e) =>
+                              setForm((f) => ({
+                                ...f,
+                                supplementaryUrl: e.target.value,
+                              }))
+                            }
+                            placeholder="https://…"
+                          />
+                        </label>
+                        <label className="btn-secondary inline-flex cursor-pointer items-center justify-center !px-3 !py-2 text-xs">
+                          Upload file
+                          <input
+                            type="file"
+                            accept=".pdf,.zip,application/pdf,application/zip"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              e.target.value = "";
+                              if (!file) return;
+                              void (async () => {
+                                try {
+                                  setError("");
+                                  const uploaded = await uploadFileDirect(file, {
+                                    folder: "psi/supplementary",
+                                  });
+                                  setForm((f) => ({
+                                    ...f,
+                                    supplementaryUrl: uploaded.url,
+                                  }));
+                                  setSuccess("Supplementary file uploaded.");
+                                } catch (err) {
+                                  setError(
+                                    err instanceof Error
+                                      ? err.message
+                                      : "Upload failed",
+                                  );
+                                }
+                              })();
+                            }}
+                          />
+                        </label>
                       </div>
                     </div>
                   </div>

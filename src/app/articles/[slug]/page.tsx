@@ -36,6 +36,10 @@ import {
 } from "@/lib/seo/article-seo";
 import { buildArticleMetadata } from "@/lib/seo/scholar";
 import { scholarlyArticleJsonLd } from "@/lib/seo/jsonld";
+import {
+  hasSupplementaryContent,
+  resolveSupplementaryHtml,
+} from "@/lib/supplementary";
 
 export const dynamic = "force-dynamic";
 
@@ -79,7 +83,14 @@ export default async function ArticleDetailPage({
     where: { slug, isActive: true, deletedAt: null },
     include: {
       journal: true,
-      submission: { select: { manuscriptUrl: true } },
+      submission: {
+        select: {
+          manuscriptUrl: true,
+          productionBody: true,
+          productionSupplementary: true,
+          productionSupplementaryUrl: true,
+        },
+      },
     },
   });
 
@@ -166,6 +177,21 @@ export default async function ArticleDetailPage({
       dbArticle.submission?.manuscriptUrl,
     );
 
+    const supplementaryHtml = resolveSupplementaryHtml({
+      supplementary:
+        dbArticle.supplementaryHtml ??
+        dbArticle.submission?.productionSupplementary,
+      body: dbArticle.submission?.productionBody,
+    });
+    const supplementaryUrl =
+      dbArticle.supplementaryUrl?.trim() ||
+      dbArticle.submission?.productionSupplementaryUrl?.trim() ||
+      null;
+    const hasSupplementary = hasSupplementaryContent({
+      html: supplementaryHtml,
+      url: supplementaryUrl,
+    });
+
     const article = {
       title: dbArticle.title,
       articleType: dbArticle.articleType,
@@ -197,6 +223,9 @@ export default async function ArticleDetailPage({
       citations: dbArticle.citations,
       manuscriptUrl,
       slug: dbArticle.slug,
+      supplementaryHref: hasSupplementary
+        ? `/articles/${dbArticle.slug}/supplementary`
+        : null,
       recommendations,
       relatedCards,
     };
@@ -272,6 +301,7 @@ type ViewArticle = {
   citations: number;
   manuscriptUrl?: string | null;
   slug: string;
+  supplementaryHref?: string | null;
   sections?: { heading: string; body: string }[];
   recommendations?: MastheadRecommendation[];
   relatedCards?: RelatedCard[];
@@ -350,6 +380,7 @@ function ArticleView({
             downloads={article.downloads}
             citations={article.citations}
             readMoreHref={viewHref}
+            supplementaryHref={article.supplementaryHref}
             recommendations={article.recommendations}
             embedded
             articleSlug={article.slug}
@@ -465,21 +496,31 @@ function ArticleView({
                       Open the PSI-formatted PDF for figures, tables,
                       methods, and the full reference list.
                     </p>
-                    {viewHref ? (
-                      <a
-                        href={viewHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn-primary mt-5 inline-flex gap-2 text-sm"
-                      >
-                        <PdfIcon />
-                        Open full article (PDF)
-                      </a>
-                    ) : (
-                      <p className="mt-4 inline-flex rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 ring-1 ring-amber-200">
-                        The PDF is being prepared and will appear here shortly.
-                      </p>
-                    )}
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      {viewHref ? (
+                        <a
+                          href={viewHref}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn-primary inline-flex gap-2 text-sm"
+                        >
+                          <PdfIcon />
+                          Open full article (PDF)
+                        </a>
+                      ) : (
+                        <p className="inline-flex rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 ring-1 ring-amber-200">
+                          The PDF is being prepared and will appear here shortly.
+                        </p>
+                      )}
+                      {article.supplementaryHref ? (
+                        <Link
+                          href={article.supplementaryHref}
+                          className="btn-secondary inline-flex text-sm"
+                        >
+                          Read supplementary materials
+                        </Link>
+                      ) : null}
+                    </div>
                   </div>
                 </section>
               )}

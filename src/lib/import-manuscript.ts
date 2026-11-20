@@ -156,6 +156,10 @@ function sanitizeAttrs(tag: string, raw: string): string {
     if (key === "data-custom-color") {
       out.push(`data-custom-color="${escapeAttr(val || "true")}"`);
     }
+    // Preserve pending figure upload targets across blur/sanitize rewrites.
+    if (key === "data-nahda-fig-id" && tag === "figure") {
+      out.push(`data-nahda-fig-id="${escapeAttr(val)}"`);
+    }
   }
   if (tag === "a") {
     out.push('target="_blank"', 'rel="noopener noreferrer"');
@@ -171,6 +175,17 @@ export function sanitizeManuscriptHtml(html: string): string {
     .replace(/\u00ad|&shy;|&#173;|&#xad;/gi, "")
     // Zero-width and word-join junk that blocks wrapping.
     .replace(/[\u200b\u200c\u200d\ufeff]/g, "")
+    // Editor-only figure selection chrome must never persist.
+    .replace(
+      /<div\b[^>]*class="[^"]*\bnahda-fig-chrome\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi,
+      "",
+    )
+    .replace(/\s*\bnahda-fig-selected\b/gi, "")
+    .replace(/\s*\bnahda-fig-dragging\b/gi, "")
+    .replace(/\s*draggable="[^"]*"/gi, "")
+    .replace(/\s*data-nahda-drop="[^"]*"/gi, "")
+    .replace(/(<figure\b[^>]*)\scontenteditable="[^"]*"/gi, "$1")
+    .replace(/(<figcaption\b[^>]*)\scontenteditable="[^"]*"/gi, "$1")
     .replace(
       /<(script|style|iframe|object|embed|link|meta|form|textarea|button|svg)[\s\S]*?<\/\1>/gi,
       "",
@@ -447,7 +462,28 @@ function cleanManuscriptArtifacts(html: string): string {
   });
 
   s = s.replace(/<(h[1-4])\b[^>]*>\s*<\/\1>/gi, "");
-  s = s.replace(/<p\b[^>]*>\s*<\/p>/gi, "");
+  // Keep blank paragraphs as vertical spacers (e.g. gap between table and text)
+  // instead of deleting them. Normalize empty <p> to a visible line break.
+  const withSpacerClass = (attrs: string) =>
+    /\bclass\s*=/.test(attrs)
+      ? attrs.replace(
+          /class=(["'])([^"']*)\1/i,
+          (_m, q: string, cls: string) =>
+            `class=${q}${cls.includes("nahda-spacer") ? cls : `${cls} nahda-spacer`.trim()}${q}`,
+        )
+      : `${attrs} class="nahda-spacer"`;
+  // Keep blank paragraphs as vertical spacers for edit + preview/print/PDF.
+  // Prefer &nbsp; so print engines keep a real line box (empty/br-only often collapses).
+  s = s.replace(/<p\b([^>]*)>\s*<\/p>/gi, (_full, attrs: string) => {
+    return `<p${withSpacerClass(attrs)}>&nbsp;</p>`;
+  });
+  s = s.replace(/<p\b([^>]*)>(\s|&nbsp;|&#160;)+<\/p>/gi, (_full, attrs: string) => {
+    return `<p${withSpacerClass(attrs)}>&nbsp;</p>`;
+  });
+  s = s.replace(
+    /<p\b([^>]*)>(\s*<br\s*\/?>\s*)+<\/p>/gi,
+    (_full, attrs: string) => `<p${withSpacerClass(attrs)}>&nbsp;</p>`,
+  );
   s = s.replace(
     /<figure class="table-full"><figcaption>([\s\S]*?)<\/figcaption><\/figure>\s*(<div class="nahda-table-wrap">[\s\S]*?<\/div>|<table\b[\s\S]*?<\/table>)/gi,
     (_full, cap: string, table: string) =>
@@ -493,27 +529,64 @@ function wrapReferencesSection(html: string): string {
   return unwrapped;
 }
 
+/** Strip leading [1] / 1. / 1) markers so CSS can number refs cleanly. */
+function stripLeadingRefMarker(html: string): string {
+  return html.replace(
+    /^(\s*(?:<(?:span|strong|b|em|i|u|a)[^>]*>\s*)*)(?:\[\s*\d+\s*\]|\(\s*\d+\s*\)|\d{1,3}[.)])\s+/i,
+    "$1",
+  );
+}
+
 function beautifyReferences(html: string): string {
   return html.replace(
     /<section class="nahda-references">([\s\S]*?)<\/section>/gi,
     (_full, inner: string) => {
-      const headingMatch = inner.match(/^(\s*<(h[1-4])\b[^>]*>[\s\S]*?<\/\2>)/i);
-      const heading = headingMatch?.[1] ?? "";
-      let rest = heading ? inner.slice(heading.length) : inner;
-      rest = rest.replace(/<div\b[^>]*>|<\/div>/gi, "");
-      rest = rest.replace(/<p\b[^>]*>([\s\S]*?)<\/p>/gi, (_p, body: string) => {
+      const headingMatch = inner.match(
+        /^(\s*<(h[1-4])\b[^>]*>[\s\S]*?<\/\2>)/i,
+      );
+      const heading = headingMatch?.[1] ?? "<h2>References</h2>";
+      let rest = headingMatch?.[1]
+        ? inner.slice(headingMatch[1].length)
+        : inner;
+      rest = rest.replace(/<\/?div\b[^>]*>/gi, "");
+      rest = rest.replace(/<\/?ol\b[^>]*>/gi, "");
+
+      const items: string[] = [];
+      const pushChunks = (body: string) => {
         const chunks = String(body)
           .split(/<br\s*\/?>/i)
           .map((part) => part.trim())
           .filter(Boolean);
-        if (chunks.length > 1) {
-          return chunks
-            .map((chunk) => `<p class="nahda-ref">${chunk}</p>`)
-            .join("");
+        for (const chunk of chunks.length ? chunks : [String(body).trim()]) {
+          if (!chunk) continue;
+          const cleaned = stripLeadingRefMarker(chunk).trim();
+          if (!htmlToPlainText(cleaned).trim()) continue;
+          items.push(`<li class="nahda-ref">${cleaned}</li>`);
         }
-        return `<p class="nahda-ref">${body}</p>`;
-      });
-      return `<section class="nahda-references">${heading}${rest}</section>`;
+      };
+
+      const itemRe = /<(p|li)\b[^>]*>([\s\S]*?)<\/\1>/gi;
+      let match: RegExpExecArray | null;
+      while ((match = itemRe.exec(rest))) {
+        pushChunks(match[2]);
+      }
+
+      // Fallback: leftover plain lines after the heading.
+      if (!items.length) {
+        const leftover = htmlToPlainText(rest)
+          .split(/\n+/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+        for (const line of leftover) {
+          const cleaned = stripLeadingRefMarker(line).trim();
+          if (cleaned) items.push(`<li class="nahda-ref">${cleaned}</li>`);
+        }
+      }
+
+      if (!items.length) {
+        return `<section class="nahda-references">${heading}</section>`;
+      }
+      return `<section class="nahda-references">${heading}<ol class="nahda-ref-list">${items.join("")}</ol></section>`;
     },
   );
 }

@@ -16,8 +16,9 @@ function appBaseUrl() {
   return getAppBaseUrl();
 }
 
+/** Horizontal mark + wordmark lockup (same role as Nahda’s email letterhead). */
 function logoFilePath() {
-  return path.join(process.cwd(), "public", "brand", "logo-psi.png");
+  return path.join(process.cwd(), "public", "brand", "logo-psi-email.png");
 }
 
 function getTransporter() {
@@ -76,7 +77,7 @@ function emailDocument(opts: {
         <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#ffffff;border:1px solid ${BRAND.line}">
           <tr>
             <td style="padding:28px 36px 18px;border-bottom:1px solid ${BRAND.line}">
-              <img src="${logoSrc}" alt="PSI Publications" width="200" style="display:block;width:200px;max-width:70%;height:auto;border:0" />
+              <img src="${logoSrc}" alt="PSI Publications" width="220" height="116" style="display:block;width:220px;max-width:72%;height:auto;border:0;outline:none;text-decoration:none" />
             </td>
           </tr>
           <tr>
@@ -135,15 +136,21 @@ export async function sendEmail(options: {
     filename: string;
     path: string;
     cid: string;
+    contentType: string;
+    contentDisposition: "inline";
   }[] = [];
 
   const logoPath = logoFilePath();
   if (fs.existsSync(logoPath)) {
     attachments.push({
-      filename: "logo-psi.png",
+      filename: "logo-psi-email.png",
       path: logoPath,
       cid: "psi-logo",
+      contentType: "image/png",
+      contentDisposition: "inline",
     });
+  } else {
+    console.warn(`[mail] PSI email logo missing at ${logoPath}`);
   }
 
   try {

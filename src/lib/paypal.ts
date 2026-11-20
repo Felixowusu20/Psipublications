@@ -29,12 +29,12 @@ export function journalPaymentAlias(journal: {
   const slug = (journal.slug ?? "").trim();
   if (slug) return slug.toUpperCase();
   const title = (journal.title ?? "").trim();
-  return title || "NAHDA";
+  return title || "PSI";
 }
 
 /**
  * Unique payment memo for PayPal notes so finance can match the manuscript.
- * Example: APC-AJS-NAHDA-2026-0142
+ * Example: APC-AJS-PSI-2026-0142
  */
 export function makePaypalPaymentReference(opts: {
   journalAlias: string;
@@ -50,5 +50,5 @@ export function makePaypalPaymentReference(opts: {
     .replace(/^-|-$/g, "")
     .toUpperCase()
     .slice(0, 32);
-  return `APC-${journal || "NAHDA"}-${ms || "MS"}`;
+  return `APC-${journal || "PSI"}-${ms || "MS"}`;
 }

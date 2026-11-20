@@ -13,6 +13,10 @@ import { deriveIssueRecords, resolveArticleIssue } from "@/lib/issues";
 import { periodicalJsonLd } from "@/lib/seo/jsonld";
 import { issueKey } from "@/lib/seo/article-seo";
 import { buildJournalMetadata } from "@/lib/seo/scholar";
+import {
+  rebrandLegacyPublisherContentOnce,
+  scrubLegacyPublisherText,
+} from "@/lib/legacy-brand";
 import { resolvePublishedPdfUrl } from "@/lib/submission-utils";
 
 export const dynamic = "force-dynamic";
@@ -52,10 +56,10 @@ export async function generateMetadata({
     const journal = await prisma.journal.findUnique({ where: { slug } });
     if (journal?.isActive) {
       return buildJournalMetadata({
-        title: journal.title,
-        shortTitle: journal.shortTitle,
+        title: scrubLegacyPublisherText(journal.title),
+        shortTitle: scrubLegacyPublisherText(journal.shortTitle),
         slug: journal.slug,
-        description: journal.description,
+        description: scrubLegacyPublisherText(journal.description),
         issn: journal.issn,
         eIssn: journal.eIssn,
         coverImageUrl: journal.coverImageUrl,
@@ -77,26 +81,40 @@ export default async function JournalDetailPage({
   const { slug } = await params;
   const { tab: rawTab } = await searchParams;
 
-  let journal = null;
+  type JournalRow = NonNullable<
+    Awaited<ReturnType<typeof prisma.journal.findUnique>>
+  >;
+  let journalRow: JournalRow | null = null;
   let articles: Array<
     Awaited<ReturnType<typeof prisma.publishedArticle.findMany>>[number] & {
       submission?: { manuscriptUrl: string | null } | null;
     }
   > = [];
   try {
-    journal = await prisma.journal.findUnique({ where: { slug } });
-    if (journal) {
+    await rebrandLegacyPublisherContentOnce();
+    journalRow = await prisma.journal.findUnique({ where: { slug } });
+    if (journalRow) {
       articles = await prisma.publishedArticle.findMany({
-        where: { journalId: journal.id, isActive: true, deletedAt: null },
+        where: { journalId: journalRow.id, isActive: true, deletedAt: null },
         include: { submission: { select: { manuscriptUrl: true } } },
         orderBy: { publishedAt: "desc" },
       });
     }
   } catch {
-    journal = null;
+    journalRow = null;
   }
 
-  if (!journal || !journal.isActive) notFound();
+  if (!journalRow || !journalRow.isActive) notFound();
+
+  const journal = {
+    ...journalRow,
+    title: scrubLegacyPublisherText(journalRow.title),
+    shortTitle: scrubLegacyPublisherText(journalRow.shortTitle),
+    description: scrubLegacyPublisherText(journalRow.description),
+    aims: journalRow.aims
+      ? scrubLegacyPublisherText(journalRow.aims)
+      : journalRow.aims,
+  };
 
   const tab = (tabs.some((t) => t.id === rawTab) ? rawTab : "about") as TabId;
   const cover = journalColorFromKey(journal.slug, journal.coverColor);

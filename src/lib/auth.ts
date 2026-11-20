@@ -43,7 +43,7 @@ export const seedUsers: DemoUser[] = [
   {
     id: "u-003",
     name: "Prof. Helen Markovic",
-    email: "editor@nahdapublications.com",
+    email: "editor@psipublications.com",
     password: "demo1234",
     role: "editor",
     institution: "PSI Publications",

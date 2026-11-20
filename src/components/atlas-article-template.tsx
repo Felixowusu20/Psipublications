@@ -181,7 +181,7 @@ export function PSIArticleTemplate({
 }: Props) {
   const palette = journalArticlePalette(
     coverColor,
-    journalSlug || journalShortTitle || "nahda",
+    journalSlug || journalShortTitle || "psi",
   );
   const typeLabel =
     (articleType || "Article").replace(/\s+Article$/i, "") || "Article";
@@ -639,7 +639,7 @@ export function PSIArticleTemplate({
         ) : null}
 
         {funding?.trim() || conflictOfInterest?.trim() ? (
-          <section className="nahda-end-matter nahda-span-all">
+          <section className="nahda-end-matter nahda-span-all" aria-label="Funding and conflicts">
             {funding?.trim() ? (
               <div>
                 <h2
@@ -674,7 +674,7 @@ export function PSIArticleTemplate({
             ) : null}
           </section>
         ) : null}
-        <section className="nahda-end-matter nahda-span-all">
+        <section className="nahda-end-matter nahda-span-all" aria-label="How to cite">
           <div>
             <h2
               className="text-[11px] font-bold uppercase tracking-[0.14em]"

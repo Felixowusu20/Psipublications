@@ -50,6 +50,13 @@ function uid() {
   return `m-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+const WELCOME_MESSAGE: ChatMessage = {
+  id: "welcome",
+  role: "system",
+  at: 0,
+  text: "Welcome to the PSI AI review desk. Search and select a submitted paper (or attach its file), then ask me to run the full editorial checklist. I’ll return arranged notes; use After the review to download the letter and email authors with a decision status.",
+};
+
 function emailsForPaper(paper: PaperOption): string[] {
   const set = new Set<string>();
   if (paper.author.email) set.add(paper.author.email.trim().toLowerCase());
@@ -71,14 +78,7 @@ export default function AdminAiPage() {
   const [paperId, setPaperId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [prompt, setPrompt] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: uid(),
-      role: "system",
-      at: Date.now(),
-      text: "Welcome to the PSI AI review desk. Search and select a submitted paper (or attach its file), then ask me to run the full editorial checklist. I’ll return arranged notes; use After the review to download the letter and email authors with a decision status.",
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [latestReport, setLatestReport] = useState<AiReviewReport | null>(

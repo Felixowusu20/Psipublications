@@ -125,7 +125,8 @@ export default function AdminSubmissionDetailPage({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not waive APC");
-      setSubmission(data.submission);
+      // Waive payload omits feedback — reload the full detail shape.
+      await load();
       setSuccess("APC waived. Status set to In Production.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Waive failed");
@@ -409,7 +410,7 @@ export default function AdminSubmissionDetailPage({
           <section className="mt-6">
             <FeedbackHistory
               submissionId={submission.id}
-              items={submission.feedback}
+              items={submission.feedback ?? []}
             />
           </section>
         </div>

@@ -20,6 +20,7 @@ export default function AdminLoginPage() {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [bootstrapAvailable, setBootstrapAvailable] = useState(false);
   const needsTurnstile = turnstileEnabled();
   const onToken = useCallback((token: string | null) => {
     setTurnstileToken(token);
@@ -28,6 +29,13 @@ export default function AdminLoginPage() {
   useEffect(() => {
     if (ready && user) router.replace("/admin");
   }, [ready, user, router]);
+
+  useEffect(() => {
+    void fetch("/api/admin/auth/bootstrap")
+      .then((res) => res.json())
+      .then((data) => setBootstrapAvailable(Boolean(data.available)))
+      .catch(() => setBootstrapAvailable(false));
+  }, []);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -89,10 +97,31 @@ export default function AdminLoginPage() {
           </button>
         </form>
         <p className="mt-4 text-center text-xs text-[var(--muted)]">
-          First setup?{" "}
-          <Link href="/admin/register" className="font-semibold text-[var(--accent)]">
-            Create super admin
-          </Link>
+          {bootstrapAvailable ? (
+            <>
+              First setup?{" "}
+              <Link
+                href="/admin/register"
+                className="font-semibold text-[var(--accent)]"
+              >
+                Create super admin
+              </Link>
+            </>
+          ) : (
+            <>
+              Author account?{" "}
+              <Link href="/login" className="font-semibold text-[var(--accent)]">
+                Sign in here
+              </Link>
+              {" · "}
+              <Link
+                href="/register"
+                className="font-semibold text-[var(--accent)]"
+              >
+                Create author account
+              </Link>
+            </>
+          )}
         </p>
       </div>
     </AuthSplitLayout>

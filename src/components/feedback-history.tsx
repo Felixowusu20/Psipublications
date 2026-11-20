@@ -43,23 +43,26 @@ export function FeedbackHistory({
   fromLabel,
 }: {
   submissionId: string;
-  items: HistoryFeedback[];
+  items?: HistoryFeedback[] | null;
   title?: string;
   hint?: string;
   emptyLabel?: string;
   fromLabel?: (item: HistoryFeedback) => string;
 }) {
+  const list = items ?? [];
+  const latestId = list[0]?.id;
+
   const [sectionOpen, setSectionOpen] = useState(true);
   const [openIds, setOpenIds] = useState<Set<string>>(
-    () => new Set(items[0] ? [items[0].id] : []),
+    () => new Set(latestId ? [latestId] : []),
   );
 
   useEffect(() => {
-    setOpenIds(new Set(items[0] ? [items[0].id] : []));
-  }, [items[0]?.id]);
+    setOpenIds(new Set(latestId ? [latestId] : []));
+  }, [latestId]);
 
-  const count = items.length;
-  const allOpen = count > 0 && items.every((item) => openIds.has(item.id));
+  const count = list.length;
+  const allOpen = count > 0 && list.every((item) => openIds.has(item.id));
 
   function toggleItem(id: string) {
     setOpenIds((current) => {
@@ -72,7 +75,7 @@ export function FeedbackHistory({
 
   function toggleAll() {
     if (allOpen) setOpenIds(new Set());
-    else setOpenIds(new Set(items.map((item) => item.id)));
+    else setOpenIds(new Set(list.map((item) => item.id)));
   }
 
   return (
@@ -115,7 +118,7 @@ export function FeedbackHistory({
           {count === 0 && (
             <p className="px-1 text-sm text-[var(--muted)]">{emptyLabel}</p>
           )}
-          {items.map((item, index) => {
+          {list.map((item, index) => {
             const open = openIds.has(item.id);
             const who = fromLabel?.(item) ?? item.reviewer.name;
             const status = uiStatus(

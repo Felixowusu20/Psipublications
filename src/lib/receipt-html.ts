@@ -22,7 +22,7 @@ export type ReceiptDownloadInput = {
 
 /** Standalone printable/downloadable APC receipt (not the email CID version). */
 export function apcReceiptDownloadHtml(opts: ReceiptDownloadInput) {
-  const logoUrl = `${getAppBaseUrl()}/brand/logo-psi.png`;
+  const logoUrl = `${getAppBaseUrl()}/brand/logo-psi-email.png`;
   const row = (label: string, value: string, last = false) => `
     <tr>
       <td style="padding:10px 0;${last ? "" : "border-bottom:1px solid #d7dee7;"}color:#5b6b7c;font-size:13px">${escapeHtml(label)}</td>
@@ -42,7 +42,7 @@ export function apcReceiptDownloadHtml(opts: ReceiptDownloadInput) {
 </head>
 <body>
   <div class="sheet">
-    <img src="${escapeHtml(logoUrl)}" alt="PSI Publications" width="180" style="display:block;width:180px;max-width:60%;height:auto" />
+    <img src="${escapeHtml(logoUrl)}" alt="PSI Publications" width="220" height="116" style="display:block;width:220px;max-width:72%;height:auto" />
     <p style="margin:18px 0 6px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#5b6b7c;font-weight:700">Payment receipt</p>
     <h1 style="margin:0 0 18px;font-size:26px">Article processing charge</h1>
     <p style="margin:0 0 8px">Paid in full for <strong>${escapeHtml(opts.title)}</strong>.</p>
@@ -78,5 +78,5 @@ export function apcReceiptDownloadHtml(opts: ReceiptDownloadInput) {
 
 export function receiptDownloadFilename(receiptNumber: string) {
   const safe = receiptNumber.replace(/[^A-Za-z0-9._-]/g, "-");
-  return `${safe || "nahda-receipt"}.html`;
+  return `${safe || "psi-receipt"}.html`;
 }

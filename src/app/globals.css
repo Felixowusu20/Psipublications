@@ -588,11 +588,44 @@ input[type="search"]::-webkit-search-results-decoration {
   background: rgba(255, 255, 255, 0.12);
 }
 
+.manuscript-wysiwyg .nahda-fig-toolbar button[data-fig-action="delete"] {
+  color: #fecaca;
+}
+
+.manuscript-wysiwyg .nahda-fig-toolbar button[data-fig-action="delete"]:hover {
+  background: rgba(244, 63, 94, 0.25);
+}
+
+.manuscript-wysiwyg .nahda-fig-toolbar button[data-fig-action="cancel"] {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .manuscript-wysiwyg .nahda-fig-toolbar [data-fig-hint] {
   color: rgba(255, 255, 255, 0.7);
   font-size: 9px;
   font-weight: 600;
   padding-inline: 0.25rem;
+}
+
+.manuscript-wysiwyg figure:has(img) {
+  cursor: grab;
+}
+
+.manuscript-wysiwyg figure.nahda-fig-selected:has(img) {
+  cursor: grab;
+}
+
+.manuscript-wysiwyg figure.nahda-fig-dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+
+.manuscript-wysiwyg [data-nahda-drop="before"] {
+  box-shadow: inset 0 3px 0 0 var(--j-primary, #1d4e89);
+}
+
+.manuscript-wysiwyg [data-nahda-drop="after"] {
+  box-shadow: inset 0 -3px 0 0 var(--j-primary, #1d4e89);
 }
 
 .manuscript-wysiwyg .nahda-fig-handle {
@@ -657,6 +690,13 @@ input[type="search"]::-webkit-search-results-decoration {
   flex-direction: column;
   justify-content: flex-end;
   cursor: pointer;
+  position: relative;
+}
+
+.manuscript-wysiwyg figure.figure-full:not(:has(img)):not(:has(table)):hover::before {
+  border-color: var(--j-primary, #1d4e89);
+  color: var(--j-primary, #1d4e89);
+  background: #f5f8fb;
 }
 
 .manuscript-wysiwyg figure.figure-full:not(:has(img)):not(:has(table))::before,
@@ -739,33 +779,35 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .nahda-article-body h1 {
-  margin: 1.15em 0 0.45em;
-  font-size: 13px;
+  margin: 1.05em 0 0.45em;
+  font-size: 21px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .nahda-article-body h2 {
-  margin: 1em 0 0.35em;
-  font-size: 14px;
+  margin: 0.95em 0 0.35em;
+  font-size: 19px;
   font-weight: 700;
 }
 
 .nahda-article-body h3,
 .nahda-article-body h4 {
   margin: 0.85em 0 0.3em;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   font-style: italic;
 }
 
 .nahda-article-body p {
   margin: 0 0 0.55em;
-  font-size: 14px;
-  line-height: 1.7;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 18.5px;
+  line-height: 1.62;
   text-align: justify;
   text-align-last: left;
+  text-indent: 1.15em;
   hyphens: none;
   -webkit-hyphens: none;
   -ms-hyphens: none;
@@ -775,6 +817,48 @@ input[type="search"]::-webkit-search-results-decoration {
   max-width: 100%;
   min-width: 0;
   color: #0b1f33;
+}
+
+/*
+ * Blank lines (Enter) — edit canvas, live preview, print, and PDF.
+ * Use padding (not only margin) so gaps do not collapse next to tables.
+ */
+.nahda-article-body > p:empty,
+.nahda-article-body > p:has(> br:only-child),
+.nahda-article-body > p:has(> br:first-child:last-child),
+.nahda-article-body > p:has(br):not(:has(:not(br))),
+.nahda-article-body > p.nahda-spacer,
+.nahda-article-flow .nahda-article-body > p:empty,
+.nahda-article-flow .nahda-article-body > p:has(> br:only-child),
+.nahda-article-flow .nahda-article-body > p:has(br):not(:has(:not(br))),
+.nahda-article-flow .nahda-article-body > p.nahda-spacer {
+  display: block !important;
+  min-height: 1.85em !important;
+  height: auto !important;
+  margin: 0.35em 0 !important;
+  padding: 0.55em 0 !important;
+  text-indent: 0 !important;
+  line-height: 1.85em !important;
+}
+
+.nahda-article-body figure + p,
+.nahda-article-body .nahda-table-wrap + p,
+.nahda-article-body table + p {
+  margin-top: 1em;
+  text-indent: 0;
+}
+
+.nahda-article-body p + figure,
+.nahda-article-body p + .nahda-table-wrap {
+  margin-top: 1.1em;
+}
+
+.nahda-article-body h1 + p,
+.nahda-article-body h2 + p,
+.nahda-article-body h3 + p,
+.nahda-article-body h4 + p,
+.nahda-article-body > p:first-child {
+  text-indent: 0;
 }
 
 .nahda-article-body p[style*="text-align: left"],
@@ -793,13 +877,14 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .nahda-article-body ul,
 .nahda-article-body ol {
-  margin: 0.4em 0 0.7em 1.2em;
-  font-size: 14px;
-  line-height: 1.65;
+  margin: 0.4em 0 0.7em 1.15em;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 18.5px;
+  line-height: 1.62;
 }
 
 .nahda-article-body li {
-  margin: 0.15em 0;
+  margin: 0.12em 0;
   text-align: justify;
   text-align-last: left;
   hyphens: none;
@@ -837,10 +922,10 @@ input[type="search"]::-webkit-search-results-decoration {
   flex-direction: column;
   width: 100%;
   max-width: 100%;
-  margin: 0.95em 0;
-  padding: 0.85em 1em;
-  background: var(--j-soft, #f3f6f7);
-  border: 1px solid #e8edf2;
+  margin: 0.85em 0 1em;
+  padding: 0;
+  background: transparent;
+  border: none;
   overflow: visible;
 }
 
@@ -850,13 +935,21 @@ input[type="search"]::-webkit-search-results-decoration {
   order: -1;
   width: 100%;
   max-width: 100%;
-  margin: 0 0 0.55em;
-  font-size: 12px;
+  margin: 0 0 0.45em;
+  font-size: 15.5px;
   line-height: 1.5;
   text-align: left;
   color: #0b1f33;
   font-family: Helvetica, Arial, sans-serif;
+  font-style: normal;
+  font-weight: 400;
 }
+
+.nahda-article-body figure:has(table) > figcaption::first-line,
+.nahda-article-body figure.table-full > figcaption::first-line {
+  font-weight: 700;
+}
+
 .nahda-article-body figure:has(table) > .nahda-table-wrap,
 .nahda-article-body figure.table-full > .nahda-table-wrap,
 .nahda-article-body figure:has(table) > table,
@@ -867,21 +960,24 @@ input[type="search"]::-webkit-search-results-decoration {
   margin: 0;
 }
 
+/* Grid tables: full cell lines so columns stay clearly separated. */
 .nahda-article-body table {
   width: 100% !important;
   max-width: 100% !important;
-  margin: 0.7em 0;
+  margin: 0.55em 0 0.75em;
   border-collapse: collapse;
   border-spacing: 0;
-  table-layout: fixed;
-  font-size: 10.5px;
-  border: 1px solid #0b1f33;
+  table-layout: auto;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 15.5px;
+  line-height: 1.45;
+  border: 1.4px solid #0b1f33;
 }
 
 .nahda-article-body th,
 .nahda-article-body td {
   border: 1px solid #0b1f33;
-  padding: 0.35em 0.45em;
+  padding: 0.5em 0.7em;
   text-align: left;
   vertical-align: top;
   width: auto !important;
@@ -890,26 +986,42 @@ input[type="search"]::-webkit-search-results-decoration {
   word-break: normal;
   hyphens: none;
   -webkit-hyphens: none;
+  color: #0b1f33;
+  background: transparent;
 }
 
 .nahda-article-body thead th {
   border: 1px solid #0b1f33;
-  font-weight: 600;
+  border-bottom: 1.4px solid #0b1f33;
+  font-weight: 700;
   color: #0b1f33;
-  background: #f7f9fb;
+  background: #f3f6f8;
+  padding-top: 0.35em;
+  padding-bottom: 0.4em;
 }
 
 .nahda-article-body tbody tr:last-child td {
   border-bottom: 1px solid #0b1f33;
 }
 
+.nahda-article-body tbody td:not(:first-child),
+.nahda-article-body thead th:not(:first-child) {
+  text-align: center;
+}
+
 .nahda-article-body figure {
-  margin: 0.85em 0;
+  margin: 1.05em 0;
 }
 
 .nahda-article-body figure:has(img),
 .nahda-article-body figure:has(table) {
   break-inside: avoid;
+}
+
+.nahda-article-body figure:has(table),
+.nahda-article-body figure.table-full {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
 }
 
 .nahda-article-body:not(.manuscript-wysiwyg) figure.figure-full:not(:has(img)):not(:has(table)),
@@ -936,13 +1048,28 @@ input[type="search"]::-webkit-search-results-decoration {
   max-width: 100%;
   height: auto;
   margin-inline: auto;
+  border: 0.7px solid #c5ced8;
+  background: #fff;
 }
 
 .nahda-article-body figcaption {
-  margin-top: 0.4em;
-  font-size: 10px;
-  line-height: 1.4;
-  color: #5b6b7c;
+  margin-top: 0.45em;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: #0b1f33;
+  text-align: left;
+}
+
+.nahda-article-body figure:has(img) > figcaption,
+.nahda-article-body figure.figure-full > figcaption {
+  margin-top: 0.45em;
+  font-style: normal;
+}
+
+.nahda-article-body figure:has(img) > figcaption::first-line,
+.nahda-article-body figure.figure-full > figcaption::first-line {
+  font-weight: 700;
 }
 
 .nahda-article-body figure:has(table) > figcaption,
@@ -964,24 +1091,54 @@ input[type="search"]::-webkit-search-results-decoration {
   overflow: visible;
 }
 
-.nahda-article-body .nahda-references {
-  display: contents;
+/* References stay in their own full-width block so they never merge with
+   end-matter / running footer in the column layout. */
+.nahda-article-body .nahda-references,
+.nahda-article-flow .nahda-references {
+  display: block;
+  column-span: all;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.4em 0 0.35em;
+  padding: 0.95em 0 0.35em;
+  border-top: 1px solid #c5ced8;
+  break-inside: auto;
+  page-break-inside: auto;
+  counter-reset: nahda-ref;
 }
 
 .nahda-article-body .nahda-references > h1,
 .nahda-article-body .nahda-references > h2,
-.nahda-article-body .nahda-references > h3 {
-  column-span: none;
+.nahda-article-body .nahda-references > h3,
+.nahda-article-flow .nahda-references > h1,
+.nahda-article-flow .nahda-references > h2,
+.nahda-article-flow .nahda-references > h3 {
+  column-span: all;
+  margin: 0 0 0.7em;
+}
+
+.nahda-article-body .nahda-ref-list,
+.nahda-article-flow .nahda-ref-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: nahda-ref;
+  width: 100%;
+  max-width: 100%;
 }
 
 .nahda-article-body .nahda-references p,
 .nahda-article-body .nahda-references li,
-.nahda-article-body .nahda-ref {
-  margin: 0 0 0.42em;
-  padding-left: 1.15em;
-  text-indent: -1.15em;
-  font-size: 11px;
-  line-height: 1.45;
+.nahda-article-body .nahda-ref,
+.nahda-article-body .nahda-ref-list > .nahda-ref {
+  counter-increment: nahda-ref;
+  display: block;
+  margin: 0 0 0.55em;
+  padding-left: 2.45em;
+  text-indent: -2.45em;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 15px;
+  line-height: 1.55;
   text-align: left;
   text-align-last: left;
   hyphens: none;
@@ -990,6 +1147,20 @@ input[type="search"]::-webkit-search-results-decoration {
   word-break: normal;
   max-width: 100%;
   color: #0b1f33;
+}
+
+.nahda-article-body .nahda-ref::before,
+.nahda-article-body .nahda-ref-list > .nahda-ref::before,
+.nahda-article-body .nahda-references > p.nahda-ref::before {
+  content: "[" counter(nahda-ref) "]";
+  display: inline;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.92em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin-right: 0.4em;
+  color: #0b1f33;
+  text-indent: 0;
 }
 
 .nahda-article {
@@ -1033,8 +1204,8 @@ input[type="search"]::-webkit-search-results-decoration {
   max-width: 100%;
   min-width: 0;
   margin: 0.55em 0 0;
-  font-size: 14px;
-  line-height: 1.75;
+  font-size: 18.5px;
+  line-height: 1.65;
   text-align: justify;
   text-align-last: left;
   /* Never auto-insert hyphenation marks — Word soft hyphens already break layout. */
@@ -1132,13 +1303,14 @@ input[type="search"]::-webkit-search-results-decoration {
   margin-top: 0.7rem;
   column-count: 2;
   column-width: 0;
-  column-gap: 1.15rem;
+  column-gap: 1.35rem;
   column-fill: balance;
   overflow: hidden;
 }
 
 .nahda-span-all,
 .nahda-article-flow .nahda-end-matter,
+.nahda-article-flow .nahda-references,
 .nahda-article-flow .nahda-supplementary,
 .nahda-article-flow figure.figure-full,
 .nahda-article-flow figure.table-full,
@@ -1241,13 +1413,20 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .nahda-article-flow .nahda-article-body > p:empty:first-child {
-  display: none;
+  display: block;
+  min-height: 1.35em;
 }
 
-.nahda-article-flow .nahda-body-inplace > p:empty:first-child,
-.nahda-article-flow .nahda-body-inplace > p:first-child:has(br:only-child) {
-  display: block;
-  min-height: 1.5em;
+.nahda-article-flow .nahda-article-body > p:empty,
+.nahda-article-flow .nahda-article-body > p.nahda-spacer,
+.nahda-article-flow .nahda-article-body > p:has(> br:only-child),
+.nahda-article-flow .nahda-article-body > p:has(br):not(:has(:not(br))),
+.nahda-article-flow .nahda-article-body > p:first-child:has(br:only-child) {
+  display: block !important;
+  min-height: 1.85em !important;
+  margin: 0.35em 0 !important;
+  padding: 0.55em 0 !important;
+  text-indent: 0 !important;
 }
 
 .nahda-keywords {
@@ -1264,8 +1443,21 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .nahda-end-matter {
-  margin: 0.7em 0 0;
-  padding-top: 0.45em;
+  display: block;
+  column-span: all;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.25em 0 0;
+  padding-top: 0.9em;
+  border-top: 1px solid #c5ced8;
+  clear: both;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.nahda-end-matter + .nahda-end-matter {
+  margin-top: 0.85em;
+  padding-top: 0.75em;
 }
 
 .nahda-end-matter p {
@@ -1296,7 +1488,7 @@ input[type="search"]::-webkit-search-results-decoration {
   max-width: 100%;
   min-width: 0;
   column-count: 2;
-  column-gap: 1.15rem;
+  column-gap: 1.35rem;
   column-fill: balance;
   overflow-wrap: break-word;
   word-break: normal;
@@ -1314,37 +1506,39 @@ input[type="search"]::-webkit-search-results-decoration {
 .nahda-article-full > .nahda-table-wrap {
   width: 100%;
   max-width: 100%;
-  margin: 0.95em 0;
-  padding: 0.85em 1em;
-  background: var(--j-soft, #f3f6f7);
-  border: 1px solid #e8edf2;
+  margin: 0.85em 0 1em;
+  padding: 0;
+  background: transparent;
+  border: none;
 }
 
 .nahda-article-columns {
   width: 100%;
   max-width: 100%;
   column-count: 2;
-  column-gap: 1.1rem;
+  column-gap: 1.35rem;
   column-fill: balance;
 }
 
-.nahda-article-body figure.figure-full {
+.nahda-article-body figure.figure-full,
+.nahda-article-body figure:has(img) {
   display: block;
   width: 100%;
   max-width: 100%;
-  margin: 0.95em 0;
-  padding: 0.85em 1em;
-  background: var(--j-soft, #f3f6f7);
-  border: 1px solid #e8edf2;
+  margin: 0.9em 0 1em;
+  padding: 0;
+  background: transparent;
+  border: none;
   text-align: center;
 }
 
 .nahda-article-body figure.figure-full > figcaption {
-  margin: 0;
-  font-size: 12px;
+  margin: 0.5em 0 0;
+  font-size: 15.5px;
   line-height: 1.5;
   font-family: Helvetica, Arial, sans-serif;
-  font-style: italic;
+  font-style: normal;
+  text-align: left;
   color: #0b1f33;
 }
 
@@ -1356,7 +1550,7 @@ input[type="search"]::-webkit-search-results-decoration {
   padding: 0.75em 1em;
   background: var(--j-soft, #f3f6f7);
   border-left: 2.5px solid var(--j-primary, var(--accent));
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.7;
   color: #0b1f33;
 }
@@ -1364,11 +1558,17 @@ input[type="search"]::-webkit-search-results-decoration {
 .nahda-running-footer {
   position: relative;
   z-index: 0;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 1.15rem;
   background: transparent;
-  padding: 0.55rem 0 0;
+  padding: 0.75rem 0 0;
   border: none;
+  border-top: 1px solid #c5ced8;
   box-shadow: none;
   overflow: visible;
+  clear: both;
 }
 
 .nahda-running-footer img {
@@ -1587,16 +1787,58 @@ input[type="search"]::-webkit-search-results-decoration {
     table-layout: auto;
     width: 100% !important;
     max-width: 100% !important;
-    font-size: 9.5px;
+    font-size: 11px;
     break-inside: auto;
     page-break-inside: auto;
-    border: 1px solid #0b1f33 !important;
+    border: 1.2px solid #0b1f33 !important;
     border-collapse: collapse !important;
+  }
+
+  .nahda-article-body p,
+  .nahda-article-body li {
+    font-size: 12.5px !important;
+    line-height: 1.5 !important;
+  }
+
+  .nahda-article-body > p.nahda-spacer,
+  .nahda-article-body > p:empty,
+  .nahda-article-body > p:has(> br:only-child),
+  .nahda-article-body > p:has(br):not(:has(:not(br))),
+  .nahda-article-flow .nahda-article-body > p.nahda-spacer,
+  .nahda-article-flow .nahda-article-body > p:empty,
+  .nahda-article-flow .nahda-article-body > p:has(br):not(:has(:not(br))) {
+    display: block !important;
+    min-height: 1.35em !important;
+    margin: 0.25em 0 !important;
+    padding: 0.45em 0 !important;
+    text-indent: 0 !important;
+    line-height: 1.35em !important;
+  }
+
+  .nahda-article-body h1 {
+    font-size: 14px !important;
+  }
+
+  .nahda-article-body h2 {
+    font-size: 13px !important;
+  }
+
+  .nahda-article-body h3,
+  .nahda-article-body h4 {
+    font-size: 12.5px !important;
   }
 
   .nahda-article-body th,
   .nahda-article-body td {
-    border: 1px solid #0b1f33 !important;
+    border: 0.85px solid #0b1f33 !important;
+  }
+
+  .nahda-article-body thead th {
+    border: 0.85px solid #0b1f33 !important;
+    border-bottom: 1.15px solid #0b1f33 !important;
+    background: #f3f6f8 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   .nahda-article-body thead {
@@ -1845,13 +2087,38 @@ input[type="search"]::-webkit-search-results-decoration {
   max-height: 220mm !important;
   table-layout: auto !important;
   overflow: visible !important;
-  border: 1px solid #0b1f33 !important;
+  border: none !important;
+  border-top: 1.5px solid #0b1f33 !important;
+  border-bottom: 1.5px solid #0b1f33 !important;
   border-collapse: collapse !important;
 }
 
 .nahda-pdf-print th,
 .nahda-pdf-print td {
-  border: 1px solid #0b1f33 !important;
+  border: none !important;
+}
+
+.nahda-pdf-print thead th {
+  border-bottom: 0.85px solid #0b1f33 !important;
+}
+
+.nahda-pdf-print figure:has(img),
+.nahda-pdf-print figure.figure-full {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.nahda-pdf-print figure:has(img) img,
+.nahda-pdf-print figure.figure-full img {
+  border: 0.7px solid #c5ced8 !important;
+}
+
+.nahda-pdf-print figure:has(table),
+.nahda-pdf-print figure.table-full {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
 }
 
 .nahda-pdf-print figcaption {
@@ -1876,6 +2143,18 @@ input[type="search"]::-webkit-search-results-decoration {
   -webkit-hyphens: none !important;
   overflow-wrap: break-word !important;
   word-break: normal !important;
+}
+
+.nahda-pdf-print .nahda-article-body > p.nahda-spacer,
+.nahda-pdf-print .nahda-article-body > p:empty,
+.nahda-pdf-print .nahda-article-body > p:has(br):not(:has(:not(br))),
+.nahda-pdf-print .nahda-article-flow .nahda-article-body > p.nahda-spacer {
+  display: block !important;
+  min-height: 1.35em !important;
+  margin: 0.25em 0 !important;
+  padding: 0.45em 0 !important;
+  text-indent: 0 !important;
+  line-height: 1.35em !important;
 }
 
 /* Goal tab panel swap — keep interactive, no AOS opacity trap */

@@ -7,6 +7,10 @@ import {
 } from "@/components/research-spotlights";
 import { resolveArticlePreviewImage } from "@/lib/article-preview-image";
 import { prisma } from "@/lib/db";
+import {
+  rebrandLegacyPublisherContentOnce,
+  scrubLegacyPublisherText,
+} from "@/lib/legacy-brand";
 import { parseGoalTabLinks } from "@/lib/home-cms-defaults";
 import { resolveArticleIssue } from "@/lib/issues";
 import { resolvePublishedPdfUrl } from "@/lib/submission-utils";
@@ -15,6 +19,7 @@ export const dynamic = "force-dynamic";
 
 async function getHomeData() {
   try {
+    await rebrandLegacyPublisherContentOnce();
     const [
       articles,
       announcements,
@@ -94,8 +99,10 @@ async function getHomeData() {
           : null;
       return {
         id: item.id,
-        title: item.title,
-        summary: item.summary,
+        title: scrubLegacyPublisherText(item.title),
+        summary: item.summary
+          ? scrubLegacyPublisherText(item.summary)
+          : item.summary,
         logoUrl: item.logoUrl,
         imageUrl:
           item.imageUrl || articleLive?.coverImageUrl || item.logoUrl || null,
@@ -107,15 +114,71 @@ async function getHomeData() {
       };
     });
 
+    const scrubbedAnnouncements = announcements.map((a) => ({
+      ...a,
+      title: scrubLegacyPublisherText(a.title),
+      summary: scrubLegacyPublisherText(a.summary),
+    }));
+
+    const scrubbedGoalTabs = goalTabs.map((tab) => ({
+      ...tab,
+      label: scrubLegacyPublisherText(tab.label),
+      title: scrubLegacyPublisherText(tab.title),
+      body: scrubLegacyPublisherText(tab.body),
+      story: tab.story ? scrubLegacyPublisherText(tab.story) : tab.story,
+      imageCaption: tab.imageCaption
+        ? scrubLegacyPublisherText(tab.imageCaption)
+        : tab.imageCaption,
+    }));
+
+    const scrubbedGoalsSection = goalsSection
+      ? {
+          ...goalsSection,
+          eyebrow: goalsSection.eyebrow
+            ? scrubLegacyPublisherText(goalsSection.eyebrow)
+            : goalsSection.eyebrow,
+          title: scrubLegacyPublisherText(goalsSection.title),
+          body: goalsSection.body
+            ? scrubLegacyPublisherText(goalsSection.body)
+            : goalsSection.body,
+        }
+      : null;
+
+    const scrubbedIndexedSection = indexedSection
+      ? {
+          ...indexedSection,
+          eyebrow: indexedSection.eyebrow
+            ? scrubLegacyPublisherText(indexedSection.eyebrow)
+            : indexedSection.eyebrow,
+          title: scrubLegacyPublisherText(indexedSection.title),
+          body: indexedSection.body
+            ? scrubLegacyPublisherText(indexedSection.body)
+            : indexedSection.body,
+        }
+      : null;
+
+    const scrubbedIndexedPlatforms = indexedPlatforms.map((p) => ({
+      ...p,
+      name: scrubLegacyPublisherText(p.name),
+      blurb: scrubLegacyPublisherText(p.blurb),
+    }));
+
+    const scrubbedJournals = journals.map((j) => ({
+    ...j,
+    title: scrubLegacyPublisherText(j.title),
+    description: scrubLegacyPublisherText(j.description),
+    aims: j.aims ? scrubLegacyPublisherText(j.aims) : j.aims,
+  }));
+
     return {
       articles,
-      announcements,
-      journals,
+      announcements: scrubbedAnnouncements,
+      journals: scrubbedJournals,
       researchCards,
-      goalTabs,
-      goalsSection,
-      indexedPlatforms,
-      indexedSection,
+      goalTabs: scrubbedGoalTabs,
+      goalsSection: scrubbedGoalsSection,
+      indexedPlatforms: scrubbedIndexedPlatforms,
+      indexedSection: scrubbedIndexedSection,
     };
   } catch {
     return {

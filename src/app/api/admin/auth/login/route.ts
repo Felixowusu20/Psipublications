@@ -26,7 +26,16 @@ export async function POST(request: Request) {
     const email = body.email.trim().toLowerCase();
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || (user.role !== "SUPER_ADMIN" && user.role !== "REVIEWER")) {
+    if (!user) {
+      return jsonError("Invalid email or password.", 401);
+    }
+    if (user.role === "AUTHOR") {
+      return jsonError(
+        "This email is an author account. Sign in at /login, or ask a super admin to grant admin access.",
+        403,
+      );
+    }
+    if (user.role !== "SUPER_ADMIN" && user.role !== "REVIEWER") {
       return jsonError("Invalid email or password.", 401);
     }
 

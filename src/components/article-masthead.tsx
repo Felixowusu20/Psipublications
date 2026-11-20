@@ -38,6 +38,8 @@ type Props = {
   citations: number;
   /** PDF download path, or null when unavailable */
   readMoreHref: string | null;
+  /** Same-article supplementary page path, when published for this slug */
+  supplementaryHref?: string | null;
   recommendations?: MastheadRecommendation[];
   /** When true, masthead sits inside a shared article shell (no extra bottom padding clash). */
   embedded?: boolean;
@@ -90,6 +92,7 @@ export function ArticleMasthead({
   downloads,
   citations,
   readMoreHref,
+  supplementaryHref = null,
   recommendations = [],
   embedded = false,
   issn,
@@ -203,7 +206,7 @@ export function ArticleMasthead({
             href={journalPath}
             className="flex flex-1 items-center px-3 py-2 text-[11px] font-medium tracking-wide text-white/95 transition hover:bg-black/10 sm:text-xs"
           >
-            nahda/{journalSlug}
+            psi/{journalSlug}
           </Link>
           <span className="flex items-center bg-[var(--ink)] px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-white sm:px-4 sm:text-[11px]">
             {typeBadgeLabel(articleType)}
@@ -392,14 +395,25 @@ export function ArticleMasthead({
 
             <span className="mx-1 hidden h-4 w-px bg-[var(--line)] sm:inline-block" />
 
-            <a
-              href="#article-content"
-              className="inline-flex items-center gap-1.5 px-2 py-1.5 font-medium transition hover:text-[var(--accent)]"
-            >
-              <SiIcon />
-              <span className="sm:hidden">Supporting info</span>
-              <span className="hidden sm:inline">Supporting Information</span>
-            </a>
+            {supplementaryHref ? (
+              <Link
+                href={supplementaryHref}
+                className="inline-flex items-center gap-1.5 px-2 py-1.5 font-medium transition hover:text-[var(--accent)]"
+              >
+                <SiIcon />
+                <span className="sm:hidden">Supporting info</span>
+                <span className="hidden sm:inline">Supporting Information</span>
+              </Link>
+            ) : (
+              <span
+                className="inline-flex items-center gap-1.5 px-2 py-1.5 font-medium text-[var(--muted)]"
+                title="No supplementary materials for this article"
+              >
+                <SiIcon />
+                <span className="sm:hidden">Supporting info</span>
+                <span className="hidden sm:inline">Supporting Information</span>
+              </span>
+            )}
           </nav>
 
           <p className="mt-4 text-[12px] text-[var(--muted)]">

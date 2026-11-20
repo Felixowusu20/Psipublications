@@ -96,7 +96,7 @@
 3. Apply at https://doaj.org with sample articles that have complete Scholar tags + PDFs.
 
 ### Google Search Console / Scholar
-1. Verify `nahdapublications.org` in GSC; submit `https://nahdapublications.org/sitemap.xml`.
+1. Verify your PSI production domain in GSC; submit `https://<your-domain>/sitemap.xml`.
 2. Confirm `NEXT_PUBLIC_APP_URL` is set to the production origin.
 3. Spot-check View Source on an article for `citation_title`, `citation_author`, `citation_pdf_url`, and JSON-LD.
 4. Use Scholar’s inclusion guidelines; ensure PDFs are not blocked by robots or login.

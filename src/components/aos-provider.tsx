@@ -67,7 +67,6 @@ export function AosProvider({ children }: { children: ReactNode }) {
     let bootTimer: number | undefined;
     let refreshTimer: number | undefined;
     let unstickTimer: number | undefined;
-    let observer: MutationObserver | undefined;
 
     const boot = () => {
       if (cancelled || booted.current) return;
@@ -112,7 +111,7 @@ export function AosProvider({ children }: { children: ReactNode }) {
       else document.addEventListener("DOMContentLoaded", onReady, { once: true });
     }
 
-    observer = new MutationObserver((mutations) => {
+    const observer = new MutationObserver((mutations) => {
       if (!booted.current || prefersReducedMotion()) return;
       let found = false;
       for (const mutation of mutations) {

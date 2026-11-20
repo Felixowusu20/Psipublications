@@ -73,6 +73,7 @@ const PAGED_CSS = `
 .nahda-paged-article .nahda-keywords,
 .nahda-paged-article figure,
 .nahda-paged-article .nahda-end-matter,
+.nahda-paged-article .nahda-references,
 .nahda-paged-article .nahda-span-all,
 .nahda-paged-article .nahda-workflow,
 .nahda-paged-article .nahda-table-wrap {
@@ -80,6 +81,37 @@ const PAGED_CSS = `
   break-inside: avoid;
   page-break-inside: avoid;
   -webkit-column-break-inside: avoid;
+}
+
+.nahda-paged-article .nahda-references {
+  display: block !important;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 1.1em;
+  padding-top: 0.75em;
+  border-top: 1px solid #c5ced8;
+}
+
+.nahda-paged-article .nahda-ref-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: nahda-ref;
+}
+
+.nahda-paged-article .nahda-ref {
+  counter-increment: nahda-ref;
+  display: block;
+  margin: 0 0 0.45em;
+  padding-left: 2.2em;
+  text-indent: -2.2em;
+}
+
+.nahda-paged-article .nahda-ref::before {
+  content: "[" counter(nahda-ref) "]";
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  margin-right: 0.35em;
 }
 
 .nahda-paged-article .nahda-article-body > figure,
