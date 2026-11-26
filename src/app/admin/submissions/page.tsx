@@ -20,6 +20,82 @@ type Submission = {
   journal: { id: string; title: string; shortTitle?: string | null };
 };
 
+type StageId =
+  | "all"
+  | "incoming"
+  | "under_review"
+  | "major_revision"
+  | "minor_revision"
+  | "accepted"
+  | "in_production"
+  | "published"
+  | "rejected";
+
+const STAGES: {
+  id: StageId;
+  label: string;
+  statuses: Submission["status"][] | null;
+}[] = [
+  { id: "all", label: "All", statuses: null },
+  {
+    id: "incoming",
+    label: "Incoming",
+    statuses: ["SUBMITTED", "TECHNICAL_CHECK"],
+  },
+  { id: "under_review", label: "Under Review", statuses: ["UNDER_REVIEW"] },
+  {
+    id: "major_revision",
+    label: "Major Revision",
+    statuses: ["MAJOR_REVISION"],
+  },
+  {
+    id: "minor_revision",
+    label: "Minor Revision",
+    statuses: ["MINOR_REVISION"],
+  },
+  { id: "accepted", label: "Accepted", statuses: ["ACCEPTED"] },
+  {
+    id: "in_production",
+    label: "In Production",
+    statuses: ["IN_PRODUCTION"],
+  },
+  { id: "published", label: "Published", statuses: ["PUBLISHED"] },
+  { id: "rejected", label: "Rejected", statuses: ["REJECTED"] },
+];
+
+function statusBadgeClass(status: Submission["status"]) {
+  switch (status) {
+    case "SUBMITTED":
+      return "bg-sky-100 text-sky-900 ring-sky-200";
+    case "TECHNICAL_CHECK":
+      return "bg-cyan-100 text-cyan-900 ring-cyan-200";
+    case "UNDER_REVIEW":
+      return "bg-indigo-100 text-indigo-900 ring-indigo-200";
+    case "MAJOR_REVISION":
+      return "bg-amber-100 text-amber-950 ring-amber-200";
+    case "MINOR_REVISION":
+      return "bg-yellow-100 text-yellow-950 ring-yellow-200";
+    case "ACCEPTED":
+      return "bg-emerald-100 text-emerald-900 ring-emerald-200";
+    case "IN_PRODUCTION":
+      return "bg-violet-100 text-violet-900 ring-violet-200";
+    case "PUBLISHED":
+      return "bg-[var(--accent-soft)] text-[var(--accent)] ring-[var(--accent)]/25";
+    case "REJECTED":
+      return "bg-rose-100 text-rose-900 ring-rose-200";
+    default:
+      return "bg-[var(--surface)] text-[var(--muted)] ring-[var(--line)]";
+  }
+}
+
+function matchesStage(
+  status: Submission["status"],
+  stage: (typeof STAGES)[number],
+) {
+  if (!stage.statuses) return true;
+  return stage.statuses.includes(status);
+}
+
 export default function AdminSubmissionsPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,19 +104,41 @@ export default function AdminSubmissionsPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [pending, setPending] = useState<Submission | null>(null);
   const [query, setQuery] = useState("");
+  const [stageId, setStageId] = useState<StageId>("all");
   const [collapsedJournals, setCollapsedJournals] = useState<Set<string>>(
     () => new Set(),
   );
 
+  const stageCounts = useMemo(() => {
+    const counts = Object.fromEntries(
+      STAGES.map((stage) => [stage.id, 0]),
+    ) as Record<StageId, number>;
+
+    for (const submission of submissions) {
+      for (const stage of STAGES) {
+        if (matchesStage(submission.status, stage)) {
+          counts[stage.id] += 1;
+        }
+      }
+    }
+    return counts;
+  }, [submissions]);
+
+  const stageFiltered = useMemo(() => {
+    const stage = STAGES.find((s) => s.id === stageId) ?? STAGES[0]!;
+    return submissions.filter((s) => matchesStage(s.status, stage));
+  }, [submissions, stageId]);
+
   const filteredSubmissions = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return submissions;
+    if (!q) return stageFiltered;
     const words = q.split(/\s+/).filter(Boolean);
-    return submissions.filter((s) => {
+    return stageFiltered.filter((s) => {
       const haystack = [
         s.title,
         s.manuscriptId,
         s.status,
+        uiStatus(s.status),
         s.author.name,
         s.author.email,
         s.journal.title,
@@ -50,7 +148,7 @@ export default function AdminSubmissionsPage() {
         .toLowerCase();
       return words.every((word) => haystack.includes(word));
     });
-  }, [submissions, query]);
+  }, [stageFiltered, query]);
 
   const journalGroups = useMemo(() => {
     const groups = new Map<
@@ -84,6 +182,7 @@ export default function AdminSubmissionsPage() {
   }, [filteredSubmissions]);
 
   const searching = query.trim().length > 0;
+  const activeStage = STAGES.find((s) => s.id === stageId) ?? STAGES[0]!;
 
   function toggleJournal(id: string) {
     setCollapsedJournals((current) => {
@@ -170,9 +269,8 @@ export default function AdminSubmissionsPage() {
         Submission inbox
       </h1>
       <p className="mt-2 text-sm text-[var(--muted)]">
-        Submissions are grouped by the journal selected by each author, making
-        editorial review and assignment easier. After acceptance, write the
-        full article in{" "}
+        Filter by editorial stage, then browse manuscripts grouped by journal.
+        After acceptance, write the full article in{" "}
         <Link
           href="/admin/manuscripts"
           className="font-semibold text-[var(--accent)]"
@@ -208,18 +306,61 @@ export default function AdminSubmissionsPage() {
       )}
 
       {!loading && submissions.length > 0 && (
-        <div className="mt-6 space-y-3">
+        <div className="mt-6 space-y-4">
+          <div
+            className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="tablist"
+            aria-label="Submission stage"
+          >
+            {STAGES.map((stage) => {
+              const selected = stage.id === stageId;
+              const count = stageCounts[stage.id];
+              return (
+                <button
+                  key={stage.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => setStageId(stage.id)}
+                  className={`inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold transition ${
+                    selected
+                      ? "bg-[var(--accent)] text-white shadow-sm"
+                      : "bg-white text-[var(--ink)] ring-1 ring-[var(--line)] hover:bg-[var(--surface)]"
+                  }`}
+                >
+                  <span>{stage.label}</span>
+                  <span
+                    className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold tabular-nums ${
+                      selected
+                        ? "bg-white/20 text-white"
+                        : "bg-[var(--surface)] text-[var(--muted)]"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {stageId === "incoming" ? (
+            <p className="text-xs text-[var(--muted)]">
+              Incoming includes Submitted and Technical Check manuscripts.
+            </p>
+          ) : null}
+
           <label className="field max-w-xl">
-            <span className="sr-only">Search submissions</span>
+            <span className="sr-only">Search submissions in this stage</span>
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by journal, title, manuscript ID, author…"
+              placeholder={`Search within ${activeStage.label.toLowerCase()}…`}
               className="w-full"
               autoComplete="off"
             />
           </label>
+
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold text-[var(--accent)]">
               {journalGroups.length}{" "}
@@ -227,7 +368,9 @@ export default function AdminSubmissionsPage() {
             </span>
             <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[var(--muted)] ring-1 ring-[var(--line)]">
               {filteredSubmissions.length}
-              {searching ? ` of ${submissions.length}` : ""}{" "}
+              {searching || stageId !== "all"
+                ? ` of ${stageFiltered.length}`
+                : ""}{" "}
               {filteredSubmissions.length === 1 ? "submission" : "submissions"}
             </span>
             {searching ? (
@@ -250,12 +393,21 @@ export default function AdminSubmissionsPage() {
             No submissions yet.
           </p>
         )}
-        {!loading && submissions.length > 0 && filteredSubmissions.length === 0 && (
-          <p className="rounded-xl border border-dashed border-[var(--line)] bg-white p-8 text-center text-sm text-[var(--muted)]">
-            No submissions match “{query.trim()}”. Try a journal name, part of
-            the title, manuscript ID, or author.
-          </p>
-        )}
+        {!loading &&
+          submissions.length > 0 &&
+          stageFiltered.length === 0 && (
+            <p className="rounded-xl border border-dashed border-[var(--line)] bg-white p-8 text-center text-sm text-[var(--muted)]">
+              No manuscripts in {activeStage.label}.
+            </p>
+          )}
+        {!loading &&
+          stageFiltered.length > 0 &&
+          filteredSubmissions.length === 0 && (
+            <p className="rounded-xl border border-dashed border-[var(--line)] bg-white p-8 text-center text-sm text-[var(--muted)]">
+              No submissions match “{query.trim()}” in {activeStage.label}. Try
+              a journal name, title, manuscript ID, or author.
+            </p>
+          )}
         {journalGroups.map((group) => {
           const collapsed = searching
             ? false
@@ -343,7 +495,9 @@ export default function AdminSubmissionsPage() {
                             className="min-w-0 flex-1"
                           >
                             <div className="flex flex-wrap items-center gap-2 text-xs">
-                              <span className="rounded-full bg-[var(--accent-soft)] px-2.5 py-0.5 font-semibold text-[var(--accent)]">
+                              <span
+                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide ring-1 ${statusBadgeClass(sub.status)}`}
+                              >
                                 {uiStatus(sub.status)}
                               </span>
                               <span className="font-mono text-[var(--muted)]">
